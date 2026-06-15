@@ -64,11 +64,22 @@
             <div id="diary-tab" class="tab-content active space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm">
                     <h3 class="text-sm font-bold mb-2">🌸 Женский календарь</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[10px] uppercase font-bold">День цикла</label><input type="number" id="cycle-day" min="1" max="40" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
-                        <div><label class="text-[10px] uppercase font-bold">Фаза</label><div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50">Начало цикла</div></div>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold">Первый день последних месячных</label>
+                            <input type="date" id="last-period-start" class="w-full p-2 border rounded-xl text-sm bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold">Текущий день цикла</label>
+                            <div id="cycle-day-display" class="p-2 border rounded-xl text-sm bg-slate-100 text-center font-bold">—</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold">Фаза</label>
+                        <div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50">Не определена</div>
                     </div>
                 </div>
+
                 <div class="bg-white p-4 rounded-2xl shadow-sm">
                     <h2 class="text-base font-bold mb-3">📝 Новая запись</h2>
                     <div class="grid grid-cols-2 gap-2 mb-3">
@@ -77,13 +88,11 @@
                     </div>
                     <div class="mb-4"><label class="text-xs font-bold">Выберите продукты из списка:</label><div id="products-checkboxes" class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2 border rounded-xl bg-slate-50 text-xs"></div></div>
                     <div class="mb-4"><label class="text-xs font-bold">Или введите свои продукты (через запятую):</label><input type="text" id="custom-products" placeholder="кинза, тофу, батат" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
-                    
-                    <!-- ПОЛЕ ДЛЯ ЛЕКАРСТВ -->
                     <div class="mb-4"><label class="text-xs font-bold">💊 Принятые лекарства (через запятую):</label><input type="text" id="medications" placeholder="цетиризин 10мг, дао-форте" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
-                    
                     <div class="space-y-2 border-t pt-3"><label class="text-xs font-bold">Оценка симптомов (0–5):</label><div id="symptoms-sliders-container"></div></div>
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl">Сохранить запись</button>
                 </div>
+
                 <div class="bg-white p-4 rounded-2xl shadow-sm">
                     <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold uppercase">Последние записи</h3><button onclick="clearAllLogs()" class="text-[10px] text-red-500 underline">Очистить всё</button></div>
                     <div id="history-container" class="space-y-2 text-xs"></div>
@@ -121,7 +130,7 @@
     </div>
 
     <script>
-        // ----- БАЗА ПРОДУКТОВ -----
+        // ----- БАЗА ПРОДУКТОВ (50+) -----
         const productsDB = [
             { name: "Авокадо", level: 1 }, { name: "Баклажаны", level: 2 }, { name: "Брокколи / Цв. капуста", level: 0 },
             { name: "Зелень (укроп, петрушка)", level: 0 }, { name: "Картофель", level: 0 }, { name: "Квашеная капуста", level: 2 },
@@ -152,23 +161,59 @@
         ];
 
         let userLogs = JSON.parse(localStorage.getItem('allevio_logs')) || [];
-        let savedCycleDay = localStorage.getItem('allevio_cycle_day');
-        if (!savedCycleDay) savedCycleDay = 1;
-        else savedCycleDay = parseInt(savedCycleDay);
+        let lastPeriodStart = localStorage.getItem('allevio_last_period_start') || "";
 
-        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ФАЗЫ ==========
+        // ---- Функции для работы с циклом ----
+        function getCurrentCycleDay() {
+            if (!lastPeriodStart) return null;
+            const start = new Date(lastPeriodStart);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            start.setHours(0,0,0,0);
+            const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+            if (diffDays < 1) return 1;
+            if (diffDays > 40) return 41; // за пределами
+            return diffDays;
+        }
+
         function getCyclePhaseName(day) {
-            day = parseInt(day);
-            if (isNaN(day)) return "Ошибка";
+            if (day === null || day > 40) return "Вне цикла / не определён";
             if (day >= 1 && day <= 5) return "Начало цикла";
             if (day >= 6 && day <= 11) return "Фолликулярная";
             if (day >= 12 && day <= 15) return "Овуляция";
             if (day >= 16 && day <= 23) return "Лютеиновая";
             if (day >= 24 && day <= 40) return "ПМС";
-            return "Вне диапазона";
+            return "—";
         }
 
-        // ---- ОБЩИЕ ФУНКЦИИ ----
+        function updateCycleUI() {
+            const cycleDay = getCurrentCycleDay();
+            const displayElem = document.getElementById('cycle-day-display');
+            const phaseElem = document.getElementById('phase-badge');
+            if (cycleDay === null || cycleDay > 40) {
+                displayElem.innerText = "не задан";
+                phaseElem.innerText = "Укажите дату начала цикла";
+                phaseElem.className = "p-2 rounded-xl text-xs font-bold text-center bg-slate-100 text-slate-500";
+                return;
+            }
+            displayElem.innerText = cycleDay;
+            const phase = getCyclePhaseName(cycleDay);
+            phaseElem.innerText = phase;
+            let color = "bg-emerald-50 text-emerald-700";
+            if (phase === "Начало цикла") color = "bg-red-50 text-red-700";
+            if (phase === "Овуляция") color = "bg-amber-50 text-amber-700";
+            if (phase === "ПМС") color = "bg-rose-100 text-rose-800";
+            phaseElem.className = `p-2 rounded-xl text-xs font-bold text-center border ${color}`;
+        }
+
+        // Сохранение даты начала цикла
+        function saveLastPeriodStart(date) {
+            lastPeriodStart = date;
+            localStorage.setItem('allevio_last_period_start', date);
+            updateCycleUI();
+        }
+
+        // ---- Остальные функции (юридический экран, сохранение записей, история, аналитика) ----
         window.toggleLegalButton = function() {
             const chk = document.getElementById('legal-checkbox');
             const btn = document.getElementById('legal-submit-btn');
@@ -179,22 +224,17 @@
             localStorage.setItem('allevio_legal_accepted', 'true');
             document.getElementById('legal-modal').style.display = 'none';
             document.getElementById('app-body').classList.remove('opacity-30', 'pointer-events-none');
-            renderDiaryForms(); renderHistory(); renderDirectory(); updateCyclePhaseDisplay();
-            const cycleInput = document.getElementById('cycle-day');
-            cycleInput.value = savedCycleDay;
-            cycleInput.addEventListener('change', function() { localStorage.setItem('allevio_cycle_day', cycleInput.value); updateCyclePhaseDisplay(); });
+            renderDiaryForms(); renderHistory(); renderDirectory(); updateCycleUI();
+            // Устанавливаем сохранённую дату или сегодняшнюю, если нет
+            if (lastPeriodStart) {
+                document.getElementById('last-period-start').value = lastPeriodStart;
+            } else {
+                // можно предложить ввести, но пока оставим пустым
+            }
+            document.getElementById('last-period-start').addEventListener('change', function(e) {
+                saveLastPeriodStart(e.target.value);
+            });
         };
-        function updateCyclePhaseDisplay() {
-            const day = parseInt(document.getElementById('cycle-day').value) || 1;
-            const phase = getCyclePhaseName(day);
-            const badge = document.getElementById('phase-badge');
-            badge.innerText = phase;
-            let color = "bg-emerald-50 text-emerald-700";
-            if (phase === "Начало цикла") color = "bg-red-50 text-red-700";
-            if (phase === "Овуляция") color = "bg-amber-50 text-amber-700";
-            if (phase === "ПМС") color = "bg-rose-100 text-rose-800";
-            badge.className = `p-2 rounded-xl text-xs font-bold text-center border ${color}`;
-        }
         window.renderDiaryForms = function() {
             const container = document.getElementById('products-checkboxes');
             container.innerHTML = productsDB.map(p => `<label class="flex items-center gap-1.5 p-1.5 bg-white rounded-xl border cursor-pointer"><input type="checkbox" value="${p.name}" class="accent-emerald-600"><span class="text-xs">${p.name}</span></label>`).join('');
@@ -204,8 +244,12 @@
         window.saveLog = function() {
             const date = document.getElementById('log-date').value;
             const time = document.getElementById('log-time').value;
-            const cycleDay = parseInt(document.getElementById('cycle-day').value) || 1;
             if (!date) { alert('Укажите дату'); return; }
+            const cycleDay = getCurrentCycleDay();
+            if (cycleDay === null || cycleDay > 40) {
+                alert('Пожалуйста, укажите первый день последних месячных в календаре');
+                return;
+            }
             const checked = Array.from(document.querySelectorAll('#products-checkboxes input:checked')).map(el => el.value);
             const customRaw = document.getElementById('custom-products').value;
             let custom = customRaw.trim() ? customRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
@@ -231,7 +275,7 @@
             container.innerHTML = sorted.slice(0,5).map(log => {
                 const symps = Object.entries(log.symptoms).filter(([k,v])=>v>0).map(([k,v])=>`${k}(${v})`).join(', ');
                 const meds = log.medications && log.medications.length ? `💊 ${log.medications.join(', ')}` : '';
-                return `<div class="bg-slate-50 p-2 rounded-xl"><div class="flex justify-between"><span>📅 ${log.date} ${log.time}</span><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500">🗑️</button></div><div>🍎 ${log.products.join(', ') || '—'}</div>${meds ? `<div class="text-purple-700">${meds}</div>` : ''}<div>⚡ Реакции: ${symps || 'нет'}</div><div>🌸 ${log.cycleDay} день цикла</div></div>`;
+                return `<div class="bg-slate-50 p-2 rounded-xl"><div class="flex justify-between"><span>📅 ${log.date} ${log.time}</span><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500">🗑️</button></div><div>🍎 ${log.products.join(', ') || '—'}</div>${meds ? `<div class="text-purple-700">${meds}</div>` : ''}<div>⚡ Реакции: ${symps || 'нет'}</div><div>🌸 День цикла: ${log.cycleDay}</div></div>`;
             }).join('');
         };
         window.deleteLog = function(date,time) { userLogs = userLogs.filter(l=>!(l.date===date && l.time===time)); localStorage.setItem('allevio_logs',JSON.stringify(userLogs)); renderHistory(); };
@@ -353,16 +397,26 @@
             if(accepted === 'true') {
                 document.getElementById('legal-modal').style.display = 'none';
                 document.getElementById('app-body').classList.remove('opacity-30','pointer-events-none');
-                renderDiaryForms(); renderHistory(); renderDirectory(); updateCyclePhaseDisplay();
-                const cycleInput = document.getElementById('cycle-day');
-                cycleInput.value = savedCycleDay;
-                cycleInput.addEventListener('change',()=>{localStorage.setItem('allevio_cycle_day', cycleInput.value); updateCyclePhaseDisplay();});
+                renderDiaryForms(); renderHistory(); renderDirectory();
+                // Восстанавливаем дату начала цикла
+                if (lastPeriodStart) {
+                    document.getElementById('last-period-start').value = lastPeriodStart;
+                } else {
+                    // можно оставить пустым
+                }
+                document.getElementById('last-period-start').addEventListener('change', function(e) {
+                    saveLastPeriodStart(e.target.value);
+                });
+                updateCycleUI();
             } else {
                 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('log-time').value = new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-                const cycleInput = document.getElementById('cycle-day');
-                cycleInput.value = savedCycleDay;
-                cycleInput.addEventListener('change',()=>{localStorage.setItem('allevio_cycle_day', cycleInput.value);});
+                if (lastPeriodStart) {
+                    document.getElementById('last-period-start').value = lastPeriodStart;
+                }
+                document.getElementById('last-period-start').addEventListener('change', function(e) {
+                    saveLastPeriodStart(e.target.value);
+                });
             }
         })();
     </script>
