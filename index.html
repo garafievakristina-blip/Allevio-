@@ -66,7 +66,7 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">День цикла</label>
-                            <input type="number" id="cycle-day" min="1" max="40" value="1" oninput="updateCyclePhaseDisplay()" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                            <input type="number" id="cycle-day" min="1" max="40" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
                             <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Фаза</label>
@@ -159,30 +159,54 @@
     </div>
 
     <script>
-        // ---------- БАЗА ПРОДУКТОВ (только для справочника и чекбоксов) ----------
+        // ---------- РАСШИРЕННАЯ БАЗА ПРОДУКТОВ (50+ позиций) ----------
         const productsDB = [
-            { name: "Авокадо", level: 1 }, { name: "Баклажаны", level: 2 }, { name: "Бананы / Сливы", level: 1 },
-            { name: "Брокколи / Цветная капуста", level: 0 }, { name: "Выдержанный сыр (Пармезан)", level: 2 },
-            { name: "Грибы шампиньоны", level: 1 }, { name: "Зелень (укроп, петрушка)", level: 0 },
-            { name: "Йогурт без добавок", level: 1 }, { name: "Картофель", level: 0 }, { name: "Квашеная капуста", level: 2 },
-            { name: "Кефир / Сметана", level: 2 }, { name: "Клубника / Цитрусовые", level: 2 },
-            { name: "Консервированная рыба", level: 2 }, { name: "Красное вино / Пиво", level: 2 },
-            { name: "Куриное яйцо", level: 1 }, { name: "Огурцы / Кабачки", level: 0 }, { name: "Орехи грецкие", level: 1 },
-            { name: "Рис / Гречка / Овсянка", level: 0 }, { name: "Свежая курица / Индейка", level: 0 },
-            { name: "Свежая рыба", level: 0 }, { name: "Сливочное / Оливковое масло", level: 0 },
-            { name: "Сосиски / Копчености", level: 2 }, { name: "Творог свежий", level: 0 }, { name: "Томаты", level: 2 },
-            { name: "Уксус / Майонез", level: 2 }, { name: "Шоколад / Какао", level: 2 }, { name: "Шпинат", level: 2 },
-            { name: "Яблоки / Груши", level: 0 }
+            // Овощи, зелень (0-2)
+            { name: "Авокадо", level: 1 }, { name: "Баклажаны", level: 2 }, { name: "Брокколи / Цветная капуста", level: 0 },
+            { name: "Зелень (укроп, петрушка)", level: 0 }, { name: "Картофель", level: 0 }, { name: "Квашеная капуста", level: 2 },
+            { name: "Лук", level: 1 }, { name: "Морковь", level: 0 }, { name: "Огурцы / Кабачки", level: 0 },
+            { name: "Свёкла", level: 0 }, { name: "Томаты", level: 2 }, { name: "Чеснок", level: 1 }, { name: "Шпинат", level: 2 },
+            // Фрукты, ягоды (0-2)
+            { name: "Абрикос", level: 1 }, { name: "Бананы / Сливы", level: 1 }, { name: "Вишня", level: 2 }, { name: "Голубика", level: 1 },
+            { name: "Клубника", level: 2 }, { name: "Манго", level: 1 }, { name: "Малина", level: 2 }, { name: "Персик", level: 1 },
+            { name: "Черешня", level: 1 }, { name: "Черника", level: 1 }, { name: "Яблоки / Груши", level: 0 },
+            // Крупы, злаки, хлеб (0-1)
+            { name: "Батат", level: 0 }, { name: "Гречка", level: 0 }, { name: "Киноа", level: 0 }, { name: "Овсяные хлопья", level: 0 },
+            { name: "Рис / Гречка / Овсянка", level: 0 }, { name: "Хлеб (пшеничный/ржаной)", level: 1 },
+            // Молочные, яйца (0-2)
+            { name: "Выдержанный сыр (Пармезан)", level: 2 }, { name: "Йогурт без добавок", level: 1 }, { name: "Кефир / Сметана", level: 2 },
+            { name: "Куриное яйцо", level: 1 }, { name: "Творог свежий", level: 0 },
+            // Мясо, рыба (0-2)
+            { name: "Баранина", level: 1 }, { name: "Говядина", level: 1 }, { name: "Консервированная рыба", level: 2 }, { name: "Свежая курица / Индейка", level: 0 },
+            { name: "Свежая рыба", level: 0 }, { name: "Свинина", level: 1 }, { name: "Сосиски / Копчености", level: 2 },
+            // Орехи, масло, прочее (0-2)
+            { name: "Грибы шампиньоны", level: 1 }, { name: "Красное вино / Пиво", level: 2 }, { name: "Орехи грецкие", level: 1 },
+            { name: "Сливочное / Оливковое масло", level: 0 }, { name: "Уксус / Майонез", level: 2 }, { name: "Шоколад / Какао", level: 2 }
         ].sort((a,b) => a.name.localeCompare(b.name));
 
+        // ---------- НОВЫЕ СИМПТОМЫ (13 штук) ----------
         const symptomsList = [
-            { id: "headache", name: "🧠 Тяжесть в голове" }, { id: "rash", name: "🔴 Покраснение кожи" },
-            { id: "fatigue", name: "🔋 Упадок сил" }, { id: "heart", name: "💓 Учащенный пульс" },
-            { id: "edema", name: "💧 Отёки" }, { id: "nose", name: "👃 Заложенность носа" },
+            { id: "brain_fog", name: "🌫️ Туман в голове" },
+            { id: "headache", name: "🤕 Головная боль" },
+            { id: "belching", name: "💨 Отрыжка" },
+            { id: "chest_pressure", name: "🔥 Распирание в пищеводе" },
+            { id: "itching", name: "🐜 Зуд" },
+            { id: "ear_congestion", name: "👂 Заложенность уха" },
+            { id: "rash", name: "🔴 Покраснение кожи" },
+            { id: "fatigue", name: "🔋 Упадок сил" },
+            { id: "heart", name: "💓 Учащенный пульс" },
+            { id: "edema", name: "💧 Отёки" },
+            { id: "diarrhea", name: "🚽 Диарея" },
+            { id: "gut_pain", name: "💢 Боль в кишечнике" },
             { id: "bloating", name: "💨 Вздутие живота" }
         ];
 
         let userLogs = JSON.parse(localStorage.getItem('allevio_logs')) || [];
+
+        // СОХРАНЕНИЕ ДНЯ ЦИКЛА
+        let savedCycleDay = localStorage.getItem('allevio_cycle_day');
+        if (!savedCycleDay) savedCycleDay = 1;
+        else savedCycleDay = parseInt(savedCycleDay);
 
         // Юридический экран
         window.toggleLegalButton = function() {
@@ -205,6 +229,13 @@
             renderHistory();
             renderDirectory();
             updateCyclePhaseDisplay();
+            // Сохраняем день цикла при изменении
+            const cycleInput = document.getElementById('cycle-day');
+            cycleInput.value = savedCycleDay;
+            cycleInput.addEventListener('change', function() {
+                localStorage.setItem('allevio_cycle_day', cycleInput.value);
+                updateCyclePhaseDisplay();
+            });
         };
 
         // Фазы цикла
@@ -225,7 +256,7 @@
             renderCycleForecast();
         };
 
-        // Отрисовка форм (чекбоксы продуктов и слайдеры симптомов)
+        // Отрисовка форм
         window.renderDiaryForms = function() {
             const containerProducts = document.getElementById('products-checkboxes');
             containerProducts.innerHTML = productsDB.map(p => `
@@ -247,37 +278,31 @@
             `).join('');
         };
 
-        // Сохранение записи (объединяем выбранные и введённые продукты)
+        // Сохранение записи
         window.saveLog = function() {
             const date = document.getElementById('log-date').value;
             const time = document.getElementById('log-time').value;
             const cycleDay = parseInt(document.getElementById('cycle-day').value) || 1;
             if (!date) { alert('Укажите дату'); return; }
 
-            // Продукты из чекбоксов
             const checkedProducts = Array.from(document.querySelectorAll('#products-checkboxes input:checked')).map(el => el.value);
-            // Продукты из текстового поля (разбиваем по запятой, обрезаем пробелы)
             const customRaw = document.getElementById('custom-products').value;
             let customProducts = [];
             if (customRaw.trim() !== "") {
                 customProducts = customRaw.split(',').map(s => s.trim()).filter(s => s !== "");
             }
-            // Объединяем и убираем дубликаты
             let allProducts = [...new Set([...checkedProducts, ...customProducts])];
             if (allProducts.length === 0) { alert('Выберите продукты из списка или введите свои'); return; }
 
-            // Симптомы
             const symptoms = {};
             document.querySelectorAll('input[data-symptom]').forEach(el => {
                 symptoms[el.getAttribute('data-symptom')] = parseInt(el.value);
             });
 
-            // Сохраняем
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
             userLogs.push({ date, time, cycleDay, products: allProducts, symptoms });
             localStorage.setItem('allevio_logs', JSON.stringify(userLogs));
 
-            // Сброс формы
             document.querySelectorAll('#products-checkboxes input:checked').forEach(el => el.checked = false);
             document.getElementById('custom-products').value = '';
             document.querySelectorAll('input[data-symptom]').forEach(el => { el.value = 0; const id = el.getAttribute('data-symptom'); document.getElementById(`val-${id}`).innerText = '0'; });
@@ -286,13 +311,12 @@
             alert('Запись сохранена');
         };
 
-        // История (отображаем все продукты, включая кастомные)
         window.renderHistory = function() {
             const container = document.getElementById('history-container');
             if (userLogs.length === 0) { container.innerHTML = '<div class="text-center text-slate-400 p-4">Нет записей</div>'; return; }
             const sorted = [...userLogs].sort((a,b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
             container.innerHTML = sorted.slice(0,5).map((log, idx) => {
-                const symps = Object.entries(log.symptoms).filter(([k,v]) => v > 0).map(([k,v]) => `${symptomsList.find(s=>s.id===k)?.name.split(' ')[0] || k} (${v}/5)`);
+                const symps = Object.entries(log.symptoms).filter(([k,v]) => v > 0).map(([k,v]) => `${symptomsList.find(s=>s.id===k)?.name.split(' ')[1] || k} (${v}/5)`);
                 return `
                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
                         <div class="flex justify-between items-center">
@@ -321,7 +345,6 @@
             }
         };
 
-        // Справочник (только продукты из базы)
         window.renderDirectory = function() {
             const search = document.getElementById('search-prod')?.value.toLowerCase() || '';
             const container = document.getElementById('directory-list');
@@ -339,7 +362,6 @@
             `).join('');
         };
 
-        // Прогноз цикла
         window.renderCycleForecast = function() {
             const day = parseInt(document.getElementById('cycle-day').value) || 1;
             const phase = getCyclePhase(day);
@@ -356,7 +378,6 @@
             container.innerHTML = `<strong>${phase.name}</strong><br><span class="opacity-75">${phase.risk}</span><p class="mt-2">${advice}</p>`;
         };
 
-        // Аналитика триггеров (учитывает и кастомные продукты)
         window.runAdvancedAnalytics = function() {
             const container = document.getElementById('analytics-results');
             if (userLogs.length < 2) {
@@ -405,7 +426,6 @@
             `;
         };
 
-        // Переключение вкладок
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`${tabId}-tab`).classList.add('active');
@@ -424,7 +444,6 @@
             btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
         });
 
-        // Инициализация
         (function init() {
             const hasAccepted = localStorage.getItem('allevio_legal_accepted');
             if (hasAccepted === 'true') {
@@ -433,12 +452,26 @@
                 renderDiaryForms();
                 renderHistory();
                 renderDirectory();
+                // Восстанавливаем сохранённый день цикла
+                const cycleInput = document.getElementById('cycle-day');
+                cycleInput.value = savedCycleDay;
+                cycleInput.addEventListener('change', function() {
+                    localStorage.setItem('allevio_cycle_day', cycleInput.value);
+                    updateCyclePhaseDisplay();
+                });
                 updateCyclePhaseDisplay();
             } else {
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('log-date').value = today;
                 const now = new Date();
                 document.getElementById('log-time').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                // Устанавливаем день цикла из сохранённого
+                const cycleInput = document.getElementById('cycle-day');
+                cycleInput.value = savedCycleDay;
+                cycleInput.addEventListener('change', function() {
+                    localStorage.setItem('allevio_cycle_day', cycleInput.value);
+                    updateCyclePhaseDisplay();
+                });
             }
         })();
     </script>
