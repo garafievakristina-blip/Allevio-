@@ -56,7 +56,7 @@
     <div id="app-body" class="opacity-30 pointer-events-none">
         <header class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 shadow-md sticky top-0 z-40">
             <h1 class="text-xl font-bold text-center">Allevio</h1>
-            <p class="text-[10px] text-center text-emerald-100 uppercase tracking-wider mt-0.5">дневник питания и биоритмов</p>
+            <p class="text-[10px] text-center text-emerald-100 uppercase tracking-wider mt-0.5">дневник питания, лекарств и биоритмов</p>
         </header>
 
         <main class="max-w-md mx-auto p-4 space-y-4">
@@ -75,8 +75,12 @@
                         <div><label class="text-[10px] font-bold uppercase">Дата</label><input type="date" id="log-date" class="w-full p-2 border rounded-xl text-xs bg-slate-50"></div>
                         <div><label class="text-[10px] font-bold uppercase">Время</label><input type="time" id="log-time" class="w-full p-2 border rounded-xl text-xs bg-slate-50"></div>
                     </div>
-                    <div class="mb-4"><label class="text-xs font-bold">Выберите из списка:</label><div id="products-checkboxes" class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2 border rounded-xl bg-slate-50 text-xs"></div></div>
-                    <div class="mb-4"><label class="text-xs font-bold">Или введите свои (через запятую):</label><input type="text" id="custom-products" placeholder="кинза, тофу, батат" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
+                    <div class="mb-4"><label class="text-xs font-bold">Выберите продукты из списка:</label><div id="products-checkboxes" class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2 border rounded-xl bg-slate-50 text-xs"></div></div>
+                    <div class="mb-4"><label class="text-xs font-bold">Или введите свои продукты (через запятую):</label><input type="text" id="custom-products" placeholder="кинза, тофу, батат" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
+                    
+                    <!-- НОВОЕ ПОЛЕ ДЛЯ ЛЕКАРСТВ -->
+                    <div class="mb-4"><label class="text-xs font-bold">💊 Принятые лекарства (через запятую):</label><input type="text" id="medications" placeholder="цетиризин 10мг, дао-форте" class="w-full p-2 border rounded-xl text-sm bg-slate-50"></div>
+                    
                     <div class="space-y-2 border-t pt-3"><label class="text-xs font-bold">Оценка симптомов (0–5):</label><div id="symptoms-sliders-container"></div></div>
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl">Сохранить запись</button>
                 </div>
@@ -86,7 +90,7 @@
                 </div>
             </div>
 
-            <!-- СПРАВОЧНИК -->
+            <!-- СПРАВОЧНИК (без изменений) -->
             <div id="directory-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm">
                     <h2 class="text-base font-bold mb-1">📚 Справочник продуктов</h2>
@@ -95,11 +99,11 @@
                 </div>
             </div>
 
-            <!-- АНАЛИТИКА (расширенная) -->
+            <!-- АНАЛИТИКА -->
             <div id="analytics-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm"><h2 class="text-base font-bold mb-1">📈 Связь симптомов с фазой цикла</h2><div id="cycle-symptom-analysis" class="text-xs space-y-2"></div></div>
                 <div class="bg-white p-4 rounded-2xl shadow-sm"><h2 class="text-base font-bold mb-1">📊 Визуальный календарь нагрузки</h2><div id="cycle-load-calendar" class="cycle-calendar"></div></div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm"><h2 class="text-base font-bold mb-1">🔍 Анализ совпадений (48ч)</h2><button onclick="runAdvancedAnalytics()" class="w-full bg-teal-600 text-white font-bold py-2.5 rounded-xl text-xs">Найти скрытые триггеры</button><div id="analytics-results" class="mt-4"></div></div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm"><h2 class="text-base font-bold mb-1">🔍 Анализ совпадений (48ч) — продукты и лекарства</h2><button onclick="runAdvancedAnalytics()" class="w-full bg-teal-600 text-white font-bold py-2.5 rounded-xl text-xs">Найти скрытые триггеры</button><div id="analytics-results" class="mt-4"></div></div>
                 <div class="bg-white p-4 rounded-2xl shadow-sm"><h2 class="text-base font-bold mb-2">📎 Экспорт данных</h2><button onclick="exportToCSV()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">Скачать отчёт (CSV)</button><p class="text-[10px] text-slate-400 mt-2">*для Excel</p></div>
             </div>
         </main>
@@ -160,7 +164,7 @@
             return "ПМС";
         }
 
-        // ---- ОБЩИЕ ФУНКЦИИ (рендер, сохранение) ----
+        // ---- ОБЩИЕ ФУНКЦИИ (рендер, сохранение, история) ----
         window.toggleLegalButton = function() {
             const chk = document.getElementById('legal-checkbox');
             const btn = document.getElementById('legal-submit-btn');
@@ -202,14 +206,18 @@
             const customRaw = document.getElementById('custom-products').value;
             let custom = customRaw.trim() ? customRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
             let allProducts = [...new Set([...checked, ...custom])];
-            if (allProducts.length === 0) { alert('Выберите или введите продукты'); return; }
+            // Лекарства
+            const medsRaw = document.getElementById('medications').value;
+            let medications = medsRaw.trim() ? medsRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
+            if (allProducts.length === 0 && medications.length === 0) { alert('Выберите/введите продукты или лекарства'); return; }
             const symptoms = {};
             document.querySelectorAll('input[data-symptom]').forEach(el => { symptoms[el.getAttribute('data-symptom')] = parseInt(el.value); });
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
-            userLogs.push({ date, time, cycleDay, products: allProducts, symptoms });
+            userLogs.push({ date, time, cycleDay, products: allProducts, medications, symptoms });
             localStorage.setItem('allevio_logs', JSON.stringify(userLogs));
             document.querySelectorAll('#products-checkboxes input:checked').forEach(el=>el.checked=false);
             document.getElementById('custom-products').value='';
+            document.getElementById('medications').value='';
             document.querySelectorAll('input[data-symptom]').forEach(el=>{el.value=0; const id=el.getAttribute('data-symptom'); document.getElementById(`val-${id}`).innerText='0';});
             renderHistory(); alert('Запись сохранена');
         };
@@ -219,11 +227,12 @@
             const sorted = [...userLogs].sort((a,b)=>new Date(b.date+'T'+b.time)-new Date(a.date+'T'+a.time));
             container.innerHTML = sorted.slice(0,5).map(log => {
                 const symps = Object.entries(log.symptoms).filter(([k,v])=>v>0).map(([k,v])=>`${k}(${v})`).join(', ');
-                return `<div class="bg-slate-50 p-2 rounded-xl"><div class="flex justify-between"><span>📅 ${log.date} ${log.time}</span><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500">🗑️</button></div><div>🍎 ${log.products.join(', ')}</div><div>⚡ ${symps || 'нет'}</div><div>🌸 ${log.cycleDay} день цикла</div></div>`;
+                const meds = log.medications && log.medications.length ? `💊 ${log.medications.join(', ')}` : '';
+                return `<div class="bg-slate-50 p-2 rounded-xl"><div class="flex justify-between"><span>📅 ${log.date} ${log.time}</span><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500">🗑️</button></div><div>🍎 ${log.products.join(', ') || '—'}</div>${meds ? `<div class="text-purple-700">${meds}</div>` : ''}<div>⚡ Реакции: ${symps || 'нет'}</div><div>🌸 ${log.cycleDay} день цикла</div></div>`;
             }).join('');
         };
         window.deleteLog = function(date,time) { userLogs = userLogs.filter(l=>!(l.date===date && l.time===time)); localStorage.setItem('allevio_logs',JSON.stringify(userLogs)); renderHistory(); };
-        window.clearAllLogs = function() { if(confirm('Удалить всё?')){ userLogs=[]; localStorage.setItem('allevio_logs','[]'); renderHistory(); } };
+        window.clearAllLogs = function() { if(confirm('Удалить все записи?')){ userLogs=[]; localStorage.setItem('allevio_logs','[]'); renderHistory(); } };
         window.renderDirectory = function() {
             const search = document.getElementById('search-prod')?.value.toLowerCase()||'';
             const container = document.getElementById('directory-list');
@@ -231,10 +240,11 @@
             const filtered = productsDB.filter(p=>p.name.toLowerCase().includes(search));
             container.innerHTML = filtered.map(p=>`<div class="flex justify-between p-2 bg-slate-50 rounded-xl"><span>${p.name}</span><span class="text-[10px]">${badges[p.level]}</span></div>`).join('');
         };
+        // АНАЛИТИКА 48ч — ТЕПЕРЬ УЧИТЫВАЕТ И ЛЕКАРСТВА
         window.runAdvancedAnalytics = function() {
             const container = document.getElementById('analytics-results');
             if (userLogs.length<2) { container.innerHTML = '<div class="text-amber-800 text-xs">Добавьте записи за 2+ дня</div>'; return; }
-            const productTriggerScore = {};
+            const triggerScore = {};
             userLogs.forEach(targetLog => {
                 const maxSymptom = Math.max(...Object.values(targetLog.symptoms));
                 if (maxSymptom>=2) {
@@ -242,20 +252,29 @@
                     userLogs.forEach(historyLog => {
                         const diffDays = (targetDate - new Date(historyLog.date))/(1000*3600*24);
                         if (diffDays>=0 && diffDays<=2) {
-                            historyLog.products.forEach(prod => {
-                                if(!productTriggerScore[prod]) productTriggerScore[prod]={weight:0,count:0};
-                                productTriggerScore[prod].weight+=maxSymptom;
-                                productTriggerScore[prod].count++;
+                            // Продукты
+                            historyLog.products.forEach(item => {
+                                if(!triggerScore[item]) triggerScore[item]={weight:0,count:0};
+                                triggerScore[item].weight+=maxSymptom;
+                                triggerScore[item].count++;
                             });
+                            // Лекарства
+                            if(historyLog.medications && historyLog.medications.length) {
+                                historyLog.medications.forEach(med => {
+                                    if(!triggerScore[med]) triggerScore[med]={weight:0,count:0};
+                                    triggerScore[med].weight+=maxSymptom;
+                                    triggerScore[med].count++;
+                                });
+                            }
                         }
                     });
                 }
             });
-            const suspects = Object.entries(productTriggerScore).map(([name,data])=>({name, score:Math.min(10,Math.round((data.weight/(userLogs.length*2))*10))})).filter(s=>s.score>0).sort((a,b)=>b.score-a.score);
-            if(!suspects.length) { container.innerHTML = '<div class="text-green-600">✅ Явных триггеров не найдено</div>'; return; }
-            container.innerHTML = `<div class="font-bold text-teal-900">🔎 Потенциальные триггеры (48ч):</div>${suspects.slice(0,5).map(s=>`<div>${s.name} — индекс ${s.score}/10</div>`).join('')}<p class="text-[10px] mt-2">*частота совпадений</p>`;
+            const suspects = Object.entries(triggerScore).map(([name,data])=>({name, score:Math.min(10,Math.round((data.weight/(userLogs.length*2))*10))})).filter(s=>s.score>0).sort((a,b)=>b.score-a.score);
+            if(!suspects.length) { container.innerHTML = '<div class="text-green-600">✅ Явных триггеров (включая лекарства) не найдено</div>'; return; }
+            container.innerHTML = `<div class="font-bold text-teal-900">🔎 Потенциальные триггеры/помощники (48ч):</div>${suspects.slice(0,5).map(s=>`<div>${s.name} — индекс ${s.score}/10</div>`).join('')}<p class="text-[10px] mt-2">*частота совпадений, не гарантирует причину. Для лекарств высокий индекс может означать связь с симптомами.</p>`;
         };
-        // Новая аналитика по фазам
+        // Аналитика по фазам цикла (без изменений, но можно потом расширить учётом лекарств)
         function renderCycleSymptomAnalysis() {
             const container = document.getElementById('cycle-symptom-analysis');
             if (!userLogs.length) { container.innerHTML = '<div class="text-center p-4">Нет данных</div>'; return; }
@@ -308,11 +327,12 @@
         }
         window.exportToCSV = function() {
             if(!userLogs.length) { alert('Нет записей'); return; }
-            let rows = [['Дата','Время','День цикла','Фаза','Продукты','Симптомы (0-5)']];
+            let rows = [['Дата','Время','День цикла','Фаза','Продукты','Лекарства','Симптомы (0-5)']];
             userLogs.forEach(log => {
                 const phase = getCyclePhaseName(log.cycleDay);
                 const symptomsStr = symptomsList.map(s=>`${s.name.split(' ')[1]||s.id}:${log.symptoms[s.id]||0}`).join('; ');
-                rows.push([log.date, log.time, log.cycleDay, phase, log.products.join(', '), symptomsStr]);
+                const medsStr = (log.medications && log.medications.length) ? log.medications.join(', ') : '';
+                rows.push([log.date, log.time, log.cycleDay, phase, log.products.join(', '), medsStr, symptomsStr]);
             });
             const csv = rows.map(row=>row.map(cell=>`"${cell}"`).join(',')).join('\n');
             const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
