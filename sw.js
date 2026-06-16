@@ -1,4 +1,6 @@
-const CACHE_NAME = 'histolite-v1';
+const CACHE_NAME = 'histolite-v2'; // Увеличил версию, чтобы старый кэш гарантированно сбросился
+
+// Файлы, которые будут закэшированы для офлайн-работы
 const urlsToCache = [
   '/HistoLite/',
   '/HistoLite/index.html'
@@ -9,7 +11,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()) // <-- НОВОЕ: заставляет новый Service Worker активироваться сразу, без ожидания
   );
 });
 
@@ -21,7 +23,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Удаляем старые кэши при активации
+// Активация — удаляем старые кэши и забираем контроль над страницей
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -29,6 +31,6 @@ self.addEventListener('activate', event => {
         cacheNames.filter(name => name !== CACHE_NAME)
           .map(name => caches.delete(name))
       );
-    })
+    }).then(() => self.clients.claim()) // <-- НОВОЕ: новый Service Worker сразу берёт управление на себя
   );
 });
