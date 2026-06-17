@@ -155,10 +155,11 @@
                         </button>
                     </div>
 
-                    <div class="space-y-2 border-t border-slate-100 pt-3">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Оценка симптомов (0–5):</label>
-                        <div id="symptoms-sliders-container"></div>
-                    </div>
+                   <div class="space-y-2 border-t border-slate-100 pt-3">
+    <label class="block text-xs font-bold text-slate-600 mb-1">📝 Какие симптомы вы испытываете? (через запятую)</label>
+    <input type="text" id="symptoms-text-input" placeholder="например: головная боль, усталость, зуд" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+    <p class="text-[10px] text-slate-400 mt-1">Можете описать словами, чтобы запомнить связь с продуктами.</p>
+</div> 
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">Сохранить запись</button>
                 </div>
 
@@ -769,33 +770,7 @@ const symptomsList = [
         `).join('');
     }
 
-    // Отрисовка симптомов (цветные кнопки)
-    const sympCont = document.getElementById('symptoms-sliders-container');
-    if (sympCont) {
-        sympCont.innerHTML = symptomsList.map(s => `
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                <div class="flex justify-between items-center text-xs font-medium mb-1">
-                    <span>${s.name}</span>
-                    <span id="val-${s.id}" class="font-bold text-slate-400">0</span>
-                </div>
-                <div class="flex items-center gap-1 justify-between mt-1">
-                    <button onclick="setSymptomValue('${s.id}', 0)" data-symptom="${s.id}" data-value="0" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-emerald-50 transition text-xs font-bold" style="border-color: #a7f3d0;">0</button>
-                    <button onclick="setSymptomValue('${s.id}', 1)" data-symptom="${s.id}" data-value="1" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-yellow-50 transition text-xs font-bold" style="border-color: #fde68a;">1</button>
-                    <button onclick="setSymptomValue('${s.id}', 2)" data-symptom="${s.id}" data-value="2" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-yellow-50 transition text-xs font-bold" style="border-color: #fde68a;">2</button>
-                    <button onclick="setSymptomValue('${s.id}', 3)" data-symptom="${s.id}" data-value="3" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-orange-50 transition text-xs font-bold" style="border-color: #fdba74;">3</button>
-                    <button onclick="setSymptomValue('${s.id}', 4)" data-symptom="${s.id}" data-value="4" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-orange-50 transition text-xs font-bold" style="border-color: #fdba74;">4</button>
-                    <button onclick="setSymptomValue('${s.id}', 5)" data-symptom="${s.id}" data-value="5" class="symptom-btn w-8 h-8 rounded-full border-2 bg-white hover:bg-rose-50 transition text-xs font-bold" style="border-color: #fca5a5;">5</button>
-                </div>
-                <div class="flex justify-between text-[9px] text-slate-400 mt-0.5">
-                    <span>нет</span>
-                    <span>лёгкий</span>
-                    <span>средний</span>
-                    <span>сильный</span>
-                </div>
-            </div>
-        `).join('');
-    }
-};
+    
         // ---- ФУНКЦИЯ ДЛЯ ВЫБОРА СИМПТОМА (цветные кнопки) ----
 function setSymptomValue(symptomId, value) {
     // Обновляем отображение числа
@@ -831,25 +806,9 @@ function setSymptomValue(symptomId, value) {
             const medsRaw = document.getElementById('medications').value;
             let medications = medsRaw.trim() ? medsRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
             if (allProducts.length === 0 && medications.length === 0) { alert('Выберите/введите продукты или лекарства'); return; }
-            const symptoms = {};
-                // Собираем значения симптомов из цветных кнопок
-    symptomsList.forEach(s => {
-        const activeBtn = document.querySelector(`button[data-symptom="${s.id}"].active-symptom`);
-        if (activeBtn) {
-            symptoms[s.id] = parseInt(activeBtn.dataset.value);
-        } else {
-            symptoms[s.id] = 0;
-        }
-    });
-            userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
-            userLogs.push({ date, time, cycleDay, products: allProducts, medications, symptoms });
+           const symptomsText = document.getElementById('symptoms-text-input').value.trim();
             localStorage.setItem('histolite_logs', JSON.stringify(userLogs));
-            document.querySelectorAll('#products-checkboxes input:checked').forEach(el=>el.checked=false);
-            document.getElementById('custom-products').value='';
-            document.getElementById('medications').value='';
-            document.querySelectorAll('input[data-symptom]').forEach(el=>{el.value=0; const id=el.getAttribute('data-symptom'); document.getElementById(`val-${id}`).innerText='0';});
-            renderHistory(); alert('Запись сохранена');
-        };
+            document.getElementById('symptoms-text-input').value = '';
 
         // ---- ИСТОРИЯ ----
         window.renderHistory = function() {
