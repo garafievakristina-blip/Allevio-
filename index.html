@@ -1002,7 +1002,48 @@ const symptomsList = [
                 });
         }
 
-        function getHistamineStatus(product) {
+                function getHistamineStatus(product) {
+            // Получаем название продукта (на русском, если есть)
+            const productName = (product.product_name_ru || product.product_name || '').toLowerCase().trim();
+            
+            // Разбиваем название на слова (по пробелам, запятым, точкам, тире)
+            const words = productName.split(/[\s,.;:—–-]+/).filter(word => word.length > 1);
+            
+            // Переменные для хранения найденных уровней
+            let foundLevels = [];
+            
+            // Проходим по каждому слову и ищем совпадение в таблице
+            for (let word of words) {
+                // Ищем в таблице запись, где имя содержит это слово или слово содержит имя
+                const found = myHistamineDB.find(item => 
+                    word.includes(item.name.toLowerCase()) || 
+                    item.name.toLowerCase().includes(word)
+                );
+                if (found) {
+                    foundLevels.push(found.level);
+                }
+            }
+            
+            // Если есть совпадения, выбираем самый высокий уровень риска
+            if (foundLevels.length > 0) {
+                // Определяем приоритет: 'высокий' > 'средний' > 'низкий'
+                let highestLevel = 'низкий';
+                if (foundLevels.includes('высокий')) {
+                    highestLevel = 'высокий';
+                } else if (foundLevels.includes('средний')) {
+                    highestLevel = 'средний';
+                }
+                
+                if (highestLevel === 'низкий') {
+                    return { level: 'low', label: '🟢 Низкий гистамин', description: 'Продукт с низким содержанием гистамина. Обычно безопасен.' };
+                } else if (highestLevel === 'средний') {
+                    return { level: 'medium', label: '🟡 Средний гистамин', description: 'Продукт со средним содержанием гистамина. Употребляйте с осторожностью.' };
+                } else if (highestLevel === 'высокий') {
+                    return { level: 'high', label: '🔴 Высокий гистамин', description: 'Продукт с высоким содержанием гистамина. Рекомендуется избегать.' };
+                }
+            }
+            
+            // Если в своей таблице не нашли, проверяем теги в Open Food Facts
             const tags = product.tags || [];
             const lowHistamineTag = tags.find(tag => tag === 'en:Low histamine');
             const highHistamineTag = tags.find(tag => tag === 'en:High histamine');
