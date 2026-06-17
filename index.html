@@ -735,23 +735,18 @@ const symptomsList = [
         }
 
         // ---- ОТРИСОВКА ФОРМ ----
-        window.renderDiaryForms = function() {
-    // Отрисовка продуктов (чекбоксы)
-    const container = document.getElementById('products-checkboxes');
-    if (container) {
-        container.innerHTML = productsDB.map(p => `
-            <label class="flex items-center gap-1.5 p-1.5 bg-white rounded-xl border border-slate-100 cursor-pointer select-none">
-                <input type="checkbox" value="${p.name}" class="product-checkbox accent-emerald-600 rounded">
-                <span class="truncate text-xs">${p.name}</span>
-            </label>
-        `).join('');
-    }
-
-    
-        // ---- ФУНКЦИЯ ДЛЯ ВЫБОРА СИМПТОМА (цветные кнопки) ----
-
-}
-
+                window.renderDiaryForms = function() {
+            // Отрисовка продуктов (чекбоксы)
+            const container = document.getElementById('products-checkboxes');
+            if (container) {
+                container.innerHTML = productsDB.map(p => `
+                    <label class="flex items-center gap-1.5 p-1.5 bg-white rounded-xl border border-slate-100 cursor-pointer select-none">
+                        <input type="checkbox" value="${p.name}" class="product-checkbox accent-emerald-600 rounded">
+                        <span class="truncate text-xs">${p.name}</span>
+                    </label>
+                `).join('');
+            }
+        };
         // ---- СОХРАНЕНИЕ ЗАПИСИ ----
                window.saveLog = function() {
             const date = document.getElementById('log-date').value;
@@ -1085,13 +1080,32 @@ const symptomsList = [
         }
 
         // ---- ИНИЦИАЛИЗАЦИЯ ----
+                // ---- ИНИЦИАЛИЗАЦИЯ ----
         (function init() {
             const accepted = localStorage.getItem('histolite_legal_accepted');
             if (accepted === 'true') {
                 document.getElementById('legal-modal').style.display = 'none';
                 document.getElementById('app-body').classList.remove('opacity-30', 'pointer-events-none');
-                
-       
+                renderDiaryForms();
+                renderHistory();
+                renderDirectory();
+                updateCyclePhaseDisplay();
+                const cycleInput = document.getElementById('cycle-day');
+                cycleInput.value = savedCycleDay;
+                cycleInput.addEventListener('change', function() { 
+                    localStorage.setItem('histolite_cycle_day', cycleInput.value); 
+                    updateCyclePhaseDisplay(); 
+                });
+            } else {
+                document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('log-time').value = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                const cycleInput = document.getElementById('cycle-day');
+                cycleInput.value = savedCycleDay;
+                cycleInput.addEventListener('change', function() { 
+                    localStorage.setItem('histolite_cycle_day', cycleInput.value); 
+                });
+            }
+        })();
     </script>
 </body>
 </html>
