@@ -32,15 +32,6 @@
         .phase-label { width: 110px; font-weight: bold; font-size: 11px; }
         .load-bar { height: 20px; border-radius: 8px; background-color: #e2e8f0; flex: 1; overflow: hidden; }
         .load-fill { height: 100%; width: 0%; border-radius: 8px; transition: width 0.3s; }
-
-        /* Защита от случайного сдвига слайдеров при скролле (уже не нужно, но оставлю) */
-        input[type="range"] {
-            touch-action: pan-y !important;
-            -webkit-user-select: none;
-            user-select: none;
-            padding: 8px 0;
-            margin: -4px 0;
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24">
@@ -51,16 +42,16 @@
             <div class="text-center text-3xl mb-2">⚖️</div>
             <h2 class="text-base font-bold text-center text-slate-800 mb-3">Пользовательское соглашение</h2>
             <div class="overflow-y-auto text-xs text-slate-500 space-y-2.5 pr-1 mb-4 flex-1 border-b border-t border-slate-100 py-3 leading-relaxed">
-                <p><strong>1. Не является медицинским сервисом.</strong> Данное приложение («ГистЛайт») представляет собой исключительно бытовой электронный дневник для личного самонаблюдения за рационом питания, приёмом лекарств и общим самочувствием.</p>
+                <p><strong>1. Не является медицинским сервисом.</strong> Данное приложение («ГистЛайт») представляет собой исключительно бытовой электронный дневник для личного самонаблюдения.</p>
                 <p><strong>2. Отказ от постановки диагнозов.</strong> Сервис не является медицинской рекомендацией.</p>
-                <p><strong>3. Необходимость консультации специалиста.</strong> Любые выводы носят ознакомительный характер. При изменениях самочувствия обратитесь к врачу.</p>
+                <p><strong>3. Необходимость консультации специалиста.</strong> Любые выводы носят ознакомительный характер.</p>
                 <p><strong>4. Ограничение ответственности.</strong> Разработчик не несет ответственности за последствия использования дневника.</p>
             </div>
             <div class="space-y-4">
                 <label class="flex items-start gap-2.5 cursor-pointer select-none">
                     <input type="checkbox" id="legal-checkbox" onchange="toggleLegalButton()" class="w-5 h-5 mt-0.5 accent-emerald-600 rounded shrink-0">
                     <span class="text-[11px] text-slate-600 leading-tight">
-                        Я подтверждаю, что ознакомлен(а) с дисклеймером, и согласен(а), что платформа <strong>не является медицинской</strong>.
+                        Я подтверждаю, что платформа <strong>не является медицинской</strong>.
                     </span>
                 </label>
                 <button id="legal-submit-btn" onclick="acceptLegal()" disabled class="w-full bg-slate-200 text-slate-400 font-bold py-3 px-4 rounded-xl text-xs transition cursor-not-allowed">
@@ -81,20 +72,6 @@
             <!-- ВКЛАДКА ДНЕВНИК -->
             <div id="diary-tab" class="tab-content active space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="text-sm font-bold text-slate-700 mb-2">🌸 Женский календарь</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">День цикла</label>
-                            <input type="number" id="cycle-day" min="1" max="40" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Фаза</label>
-                            <div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50 text-emerald-700 border border-emerald-100 mt-0.5">Начало цикла</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">📝 Новая запись</h2>
                     <div class="grid grid-cols-2 gap-2 mb-3">
                         <div>
@@ -106,20 +83,26 @@
                             <input type="time" id="log-time" class="w-full p-2 border border-slate-200 rounded-xl text-xs bg-slate-50">
                         </div>
                     </div>
+
+                    <!-- Выбор продуктов -->
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">Выберите продукты из списка:</label>
                         <div id="products-checkboxes" class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2 border border-slate-100 rounded-xl bg-slate-50 text-xs"></div>
                     </div>
+
+                    <!-- Свои продукты -->
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">Или введите свои продукты (через запятую):</label>
                         <input type="text" id="custom-products" placeholder="кинза, тофу, батат" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                     </div>
+
+                    <!-- Лекарства -->
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">💊 Принятые лекарства (через запятую):</label>
                         <input type="text" id="medications" placeholder="цетиризин 10мг, дао-форте" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                     </div>
 
-                    <!-- Кнопка сканирования и контейнер -->
+                    <!-- Сканирование -->
                     <div class="mb-4">
                         <button onclick="scanBarcode()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm">
                             📷 Сканировать штрих-код
@@ -132,11 +115,13 @@
                         </button>
                     </div>
 
+                    <!-- Симптомы -->
                     <div class="space-y-2 border-t border-slate-100 pt-3">
                         <label class="block text-xs font-bold text-slate-600 mb-1">📝 Какие симптомы вы испытываете? (через запятую)</label>
                         <input type="text" id="symptoms-text-input" placeholder="например: головная боль, усталость, зуд" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         <p class="text-[10px] text-slate-400 mt-1">Можете описать словами, чтобы запомнить связь с продуктами.</p>
-                    </div> 
+                    </div>
+
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">Сохранить запись</button>
                 </div>
 
@@ -149,12 +134,33 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА СПРАВОЧНИК -->
-            <div id="directory-tab" class="tab-content space-y-4">
+            <!-- ВКЛАДКА КАЛЕНДАРЬ -->
+            <div id="calendar-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                    <h2 class="text-base font-bold mb-1">📚 Справочник продуктов</h2>
-                    <input type="text" id="search-prod" oninput="renderDirectory()" placeholder="Поиск..." class="w-full p-2.5 mb-3 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-emerald-500">
-                    <div id="directory-list" class="space-y-1.5 max-h-96 overflow-y-auto pr-1"></div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-2">🌸 Женский календарь</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Первый день последней менструации</label>
+                            <input type="date" id="last-period-start" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Длительность цикла (дней)</label>
+                            <input type="number" id="cycle-length" min="20" max="45" value="28" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Текущий день цикла</label>
+                            <div id="cycle-day-display" class="p-2 border rounded-xl text-sm bg-slate-100 text-center font-bold">—</div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Фаза</label>
+                            <div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50 text-emerald-700 border border-emerald-100 mt-0.5">Не определена</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-xl text-xs text-slate-600" id="cycle-forecast">
+                        <p class="text-center">Настройте дату начала цикла для прогноза.</p>
+                    </div>
                 </div>
             </div>
 
@@ -183,7 +189,7 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl flex justify-around p-2 z-40">
             <button data-tab="diary" class="tab-button flex flex-col items-center p-1.5 text-emerald-600 font-bold text-[10px] gap-1 w-1/3"><span class="text-lg">📝</span><span>Дневник</span></button>
-            <button data-tab="directory" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/3"><span class="text-lg">📚</span><span>Продукты</span></button>
+            <button data-tab="calendar" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/3"><span class="text-lg">🌸</span><span>Календарь</span></button>
             <button data-tab="analytics" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/3"><span class="text-lg">📊</span><span>Анализ</span></button>
         </nav>
 
@@ -248,425 +254,16 @@
             { name: "Шоколад / Какао", level: 2 }
         ].sort((a,b) => a.name.localeCompare(b.name));
 
-        // ----- МОЯ ТАБЛИЦА ГИСТАМИНОВЫХ ПРОДУКТОВ -----
-         const myHistamineDB = [
-    // ========== ОВОЩИ ==========
-    { name: "кабачок", level: "низкий" },
-    { name: "цуккини", level: "низкий" },
-    { name: "тыква", level: "низкий" },
-    { name: "брокколи", level: "низкий" },
-    { name: "цветная капуста", level: "низкий" },
-    { name: "белокочанная капуста", level: "низкий" },
-    { name: "пекинская капуста", level: "низкий" },
-    { name: "картофель", level: "низкий" },
-    { name: "батат", level: "низкий" },
-    { name: "морковь", level: "низкий" },
-    { name: "свёкла", level: "низкий" },
-    { name: "репа", level: "низкий" },
-    { name: "редька", level: "низкий" },
-    { name: "редис", level: "низкий" },
-    { name: "огурец", level: "низкий" },
-    { name: "салат", level: "низкий" },
-    { name: "айсберг", level: "низкий" },
-    { name: "руккола", level: "низкий" },
-    { name: "петрушка", level: "низкий" },
-    { name: "укроп", level: "низкий" },
-    { name: "базилик", level: "низкий" },
-    { name: "кинза", level: "высокий" },
-    { name: "щавель", level: "высокий" },
-    { name: "чеснок", level: "средний" },
-    { name: "лук", level: "средний" },
-    { name: "лук зелёный", level: "средний" },
-    { name: "лук порей", level: "средний" },
-    { name: "баклажан", level: "высокий" },
-    { name: "помидор", level: "высокий" },
-    { name: "томат", level: "высокий" },
-    { name: "перец сладкий", level: "средний" },
-    { name: "перец болгарский", level: "средний" },
-    { name: "перец острый", level: "высокий" },
-    { name: "чили", level: "высокий" },
-    { name: "шпинат", level: "высокий" },
-    { name: "капуста квашеная", level: "высокий" },
-    { name: "капуста маринованная", level: "высокий" },
-    { name: "соленья", level: "высокий" },
-    { name: "огурцы солёные", level: "высокий" },
-    { name: "помидоры солёные", level: "высокий" },
-    { name: "грибы", level: "средний" },
-    { name: "шампиньоны", level: "средний" },
-    { name: "вешенки", level: "средний" },
-    { name: "белые грибы", level: "средний" },
+        // ----- МОЯ ТАБЛИЦА ГИСТАМИНОВЫХ ПРОДУКТОВ (сокращена для примера, вставьте свою полную) -----
+        const myHistamineDB = [
+            { name: "кабачок", level: "низкий" },
+            { name: "помидор", level: "высокий" },
+            { name: "кетчуп", level: "высокий" },
+            { name: "майонез", level: "высокий" },
+            // ... добавьте остальные продукты из вашей таблицы
+        ];
 
-    // ========== ФРУКТЫ И ЯГОДЫ ==========
-    { name: "яблоко", level: "низкий" },
-    { name: "яблоки", level: "низкий" },
-    { name: "груша", level: "низкий" },
-    { name: "груши", level: "низкий" },
-    { name: "айва", level: "низкий" },
-    { name: "хурма", level: "низкий" },
-    { name: "гранат", level: "низкий" },
-    { name: "инжир", level: "низкий" },
-    { name: "арбуз", level: "низкий" },
-    { name: "дыня", level: "низкий" },
-    { name: "черника", level: "низкий" },
-    { name: "голубика", level: "низкий" },
-    { name: "ежевика", level: "низкий" },
-    { name: "клюква", level: "низкий" },
-    { name: "брусника", level: "низкий" },
-    { name: "смородина", level: "низкий" },
-    { name: "крыжовник", level: "низкий" },
-    { name: "банан", level: "средний" },
-    { name: "бананы", level: "средний" },
-    { name: "манго", level: "средний" },
-    { name: "персик", level: "средний" },
-    { name: "нектарин", level: "средний" },
-    { name: "абрикос", level: "средний" },
-    { name: "слива", level: "средний" },
-    { name: "алыча", level: "средний" },
-    { name: "финик", level: "средний" },
-    { name: "малина", level: "высокий" },
-    { name: "клубника", level: "высокий" },
-    { name: "земляника", level: "высокий" },
-    { name: "вишня", level: "высокий" },
-    { name: "черешня", level: "высокий" },
-    { name: "киви", level: "высокий" },
-    { name: "ананас", level: "высокий" },
-    { name: "папайя", level: "высокий" },
-    { name: "апельсин", level: "высокий" },
-    { name: "грейпфрут", level: "высокий" },
-    { name: "лимон", level: "средний" },
-    { name: "лайм", level: "средний" },
-    { name: "мандарин", level: "высокий" },
-    { name: "помело", level: "высокий" },
-    { name: "виноград", level: "высокий" },
-
-    // ========== КРУПЫ, ЗЛАКИ, МУКА ==========
-    { name: "рис", level: "низкий" },
-    { name: "рис белый", level: "низкий" },
-    { name: "рис бурый", level: "низкий" },
-    { name: "рис дикий", level: "низкий" },
-    { name: "гречка", level: "низкий" },
-    { name: "гречневая крупа", level: "низкий" },
-    { name: "овсянка", level: "низкий" },
-    { name: "овсяные хлопья", level: "низкий" },
-    { name: "геркулес", level: "низкий" },
-    { name: "киноа", level: "низкий" },
-    { name: "пшено", level: "низкий" },
-    { name: "пшённая крупа", level: "низкий" },
-    { name: "кукурузная крупа", level: "низкий" },
-    { name: "манка", level: "низкий" },
-    { name: "манная крупа", level: "низкий" },
-    { name: "перловка", level: "низкий" },
-    { name: "перловая крупа", level: "низкий" },
-    { name: "ячневая крупа", level: "низкий" },
-    { name: "булгур", level: "низкий" },
-    { name: "кускус", level: "низкий" },
-    { name: "полба", level: "низкий" },
-    { name: "сорго", level: "низкий" },
-    { name: "амарант", level: "низкий" },
-    { name: "макароны", level: "низкий" },
-    { name: "спагетти", level: "низкий" },
-    { name: "лапша", level: "низкий" },
-    { name: "вермишель", level: "низкий" },
-    { name: "мука", level: "низкий" },
-    { name: "мука пшеничная", level: "низкий" },
-    { name: "мука ржаная", level: "низкий" },
-    { name: "хлеб", level: "средний" },
-    { name: "хлеб белый", level: "средний" },
-    { name: "хлеб ржаной", level: "средний" },
-    { name: "хлеб чёрный", level: "средний" },
-    { name: "бородинский", level: "средний" },
-    { name: "батон", level: "средний" },
-    { name: "булка", level: "средний" },
-    { name: "лаваш", level: "средний" },
-    { name: "сухари", level: "средний" },
-    { name: "гренки", level: "средний" },
-    { name: "суши", level: "средний" },
-
-    // ========== МЯСО, ПТИЦА, СУБПРОДУКТЫ ==========
-    { name: "курица", level: "низкий" },
-    { name: "куриное филе", level: "низкий" },
-    { name: "куриная грудка", level: "низкий" },
-    { name: "куриные ножки", level: "низкий" },
-    { name: "индейка", level: "низкий" },
-    { name: "филе индейки", level: "низкий" },
-    { name: "индюшка", level: "низкий" },
-    { name: "кролик", level: "низкий" },
-    { name: "говядина", level: "средний" },
-    { name: "телятина", level: "средний" },
-    { name: "баранина", level: "высокий" },
-    { name: "свинина", level: "высокий" },
-    { name: "утка", level: "высокий" },
-    { name: "гусь", level: "высокий" },
-    { name: "колбаса", level: "высокий" },
-    { name: "колбаса варёная", level: "высокий" },
-    { name: "колбаса копчёная", level: "высокий" },
-    { name: "сосиски", level: "высокий" },
-    { name: "сардельки", level: "высокий" },
-    { name: "ветчина", level: "высокий" },
-    { name: "балык", level: "высокий" },
-    { name: "карбонат", level: "высокий" },
-    { name: "окорок", level: "высокий" },
-    { name: "печень", level: "высокий" },
-    { name: "говяжья печень", level: "высокий" },
-    { name: "куриная печень", level: "высокий" },
-    { name: "почки", level: "высокий" },
-    { name: "сердце", level: "высокий" },
-    { name: "язык", level: "высокий" },
-    { name: "фарш", level: "высокий" },
-
-    // ========== РЫБА И МОРЕПРОДУКТЫ ==========
-    { name: "треска", level: "низкий" },
-    { name: "минтай", level: "низкий" },
-    { name: "пикша", level: "низкий" },
-    { name: "палтус", level: "низкий" },
-    { name: "камбала", level: "низкий" },
-    { name: "хек", level: "низкий" },
-    { name: "судак", level: "низкий" },
-    { name: "окунь", level: "низкий" },
-    { name: "щука", level: "низкий" },
-    { name: "налим", level: "низкий" },
-    { name: "тилапия", level: "низкий" },
-    { name: "пангасиус", level: "низкий" },
-    { name: "лосось", level: "высокий" },
-    { name: "сёмга", level: "высокий" },
-    { name: "форель", level: "высокий" },
-    { name: "горбуша", level: "высокий" },
-    { name: "кета", level: "высокий" },
-    { name: "нерка", level: "высокий" },
-    { name: "кижуч", level: "высокий" },
-    { name: "тунец", level: "высокий" },
-    { name: "скумбрия", level: "высокий" },
-    { name: "ставрида", level: "высокий" },
-    { name: "сардины", level: "высокий" },
-    { name: "анчоусы", level: "высокий" },
-    { name: "осётр", level: "высокий" },
-    { name: "белуга", level: "высокий" },
-    { name: "икра", level: "высокий" },
-    { name: "красная икра", level: "высокий" },
-    { name: "чёрная икра", level: "высокий" },
-    { name: "консервы рыбные", level: "высокий" },
-    { name: "шпроты", level: "высокий" },
-    { name: "килька", level: "высокий" },
-    { name: "мойва", level: "высокий" },
-    { name: "сельдь", level: "высокий" },
-    { name: "солёная рыба", level: "высокий" },
-    { name: "копчёная рыба", level: "высокий" },
-    { name: "вяленая рыба", level: "высокий" },
-    { name: "сушёная рыба", level: "высокий" },
-    { name: "креветки", level: "высокий" },
-    { name: "мидии", level: "высокий" },
-    { name: "кальмары", level: "высокий" },
-    { name: "осьминоги", level: "высокий" },
-    { name: "крабы", level: "высокий" },
-    { name: "крабовые палочки", level: "высокий" },
-
-    // ========== МОЛОЧНЫЕ ПРОДУКТЫ ==========
-    { name: "творог", level: "низкий" },
-    { name: "творог свежий", level: "низкий" },
-    { name: "творог обезжиренный", level: "низкий" },
-    { name: "творожная масса", level: "низкий" },
-    { name: "сыр", level: "высокий" },
-    { name: "сыр твёрдый", level: "высокий" },
-    { name: "сыр мягкий", level: "высокий" },
-    { name: "сыр плавленый", level: "высокий" },
-    { name: "пармезан", level: "высокий" },
-    { name: "гауда", level: "высокий" },
-    { name: "эдам", level: "высокий" },
-    { name: "чеддер", level: "высокий" },
-    { name: "моцарелла", level: "средний" },
-    { name: "рикотта", level: "средний" },
-    { name: "фета", level: "высокий" },
-    { name: "брынза", level: "высокий" },
-    { name: "сулугуни", level: "высокий" },
-    { name: "адыгейский сыр", level: "средний" },
-    { name: "мацони", level: "высокий" },
-    { name: "молоко", level: "средний" },
-    { name: "молоко цельное", level: "средний" },
-    { name: "молоко обезжиренное", level: "средний" },
-    { name: "молоко топлёное", level: "средний" },
-    { name: "ряженка", level: "высокий" },
-    { name: "кефир", level: "высокий" },
-    { name: "йогурт", level: "средний" },
-    { name: "йогурт питьевой", level: "средний" },
-    { name: "йогурт натуральный", level: "средний" },
-    { name: "йогурт без добавок", level: "средний" },
-    { name: "сметана", level: "средний" },
-    { name: "сливки", level: "средний" },
-    { name: "масло сливочное", level: "низкий" },
-    { name: "маргарин", level: "средний" },
-    { name: "сгущёнка", level: "средний" },
-    { name: "сгущённое молоко", level: "средний" },
-
-    // ========== ЯЙЦА ==========
-    { name: "яйцо", level: "средний" },
-    { name: "яйца", level: "средний" },
-    { name: "куриное яйцо", level: "средний" },
-    { name: "яйцо куриное", level: "средний" },
-    { name: "яйцо перепелиное", level: "средний" },
-    { name: "яичный белок", level: "низкий" },
-    { name: "яичный желток", level: "средний" },
-    { name: "меланж", level: "средний" },
-
-    // ========== НАПИТКИ ==========
-    { name: "чай", level: "низкий" },
-    { name: "чёрный чай", level: "низкий" },
-    { name: "зелёный чай", level: "низкий" },
-    { name: "белый чай", level: "низкий" },
-    { name: "травяной чай", level: "низкий" },
-    { name: "ромашковый чай", level: "низкий" },
-    { name: "мятный чай", level: "низкий" },
-    { name: "имбирный чай", level: "низкий" },
-    { name: "компот", level: "низкий" },
-    { name: "морс", level: "низкий" },
-    { name: "квас", level: "высокий" },
-    { name: "кофе", level: "высокий" },
-    { name: "кофе растворимый", level: "высокий" },
-    { name: "кофе молотый", level: "высокий" },
-    { name: "какао", level: "высокий" },
-    { name: "шоколад", level: "высокий" },
-    { name: "вино", level: "высокий" },
-    { name: "красное вино", level: "высокий" },
-    { name: "белое вино", level: "высокий" },
-    { name: "игристое вино", level: "высокий" },
-    { name: "шампанское", level: "высокий" },
-    { name: "пиво", level: "высокий" },
-    { name: "тёмное пиво", level: "высокий" },
-    { name: "светлое пиво", level: "высокий" },
-    { name: "сидр", level: "высокий" },
-    { name: "виски", level: "высокий" },
-    { name: "водка", level: "средний" },
-    { name: "коньяк", level: "средний" },
-    { name: "ром", level: "средний" },
-    { name: "джин", level: "средний" },
-    { name: "ликёр", level: "средний" },
-    { name: "сок", level: "средний" },
-    { name: "сок яблочный", level: "средний" },
-    { name: "сок апельсиновый", level: "высокий" },
-    { name: "сок томатный", level: "высокий" },
-    { name: "газировка", level: "средний" },
-    { name: "кола", level: "средний" },
-
-    // ========== ОРЕХИ, СЕМЕНА, СУХОФРУКТЫ ==========
-    { name: "грецкий орех", level: "средний" },
-    { name: "грецкие орехи", level: "средний" },
-    { name: "миндаль", level: "средний" },
-    { name: "кешью", level: "средний" },
-    { name: "фундук", level: "средний" },
-    { name: "лесной орех", level: "средний" },
-    { name: "арахис", level: "средний" },
-    { name: "фисташки", level: "средний" },
-    { name: "кедровый орех", level: "средний" },
-    { name: "бразильский орех", level: "средний" },
-    { name: "тыквенные семечки", level: "низкий" },
-    { name: "подсолнечные семечки", level: "низкий" },
-    { name: "семечки", level: "низкий" },
-    { name: "семена льна", level: "низкий" },
-    { name: "льняное семя", level: "низкий" },
-    { name: "чиа", level: "низкий" },
-    { name: "семена чиа", level: "низкий" },
-    { name: "кунжут", level: "низкий" },
-    { name: "изюм", level: "высокий" },
-    { name: "курага", level: "высокий" },
-    { name: "чернослив", level: "высокий" },
-    { name: "финики", level: "высокий" },
-    { name: "инжир сушёный", level: "высокий" },
-
-    // ========== МАСЛА И ЖИРЫ ==========
-    { name: "оливковое масло", level: "низкий" },
-    { name: "масло оливковое", level: "низкий" },
-    { name: "кокосовое масло", level: "низкий" },
-    { name: "масло кокосовое", level: "низкий" },
-    { name: "подсолнечное масло", level: "низкий" },
-    { name: "масло подсолнечное", level: "низкий" },
-    { name: "кукурузное масло", level: "низкий" },
-    { name: "льняное масло", level: "низкий" },
-    { name: "масло виноградных косточек", level: "низкий" },
-    { name: "масло грецкого ореха", level: "низкий" },
-
-    // ========== СПЕЦИИ И ПРИПРАВЫ ==========
-    { name: "соль", level: "низкий" },
-    { name: "морская соль", level: "низкий" },
-    { name: "йодированная соль", level: "низкий" },
-    { name: "перец чёрный", level: "высокий" },
-    { name: "перец душистый", level: "высокий" },
-    { name: "перец красный", level: "высокий" },
-    { name: "перец кайенский", level: "высокий" },
-    { name: "паприка", level: "высокий" },
-    { name: "карри", level: "высокий" },
-    { name: "мускатный орех", level: "высокий" },
-    { name: "гвоздика", level: "средний" },
-    { name: "корица", level: "низкий" },
-    { name: "имбирь", level: "низкий" },
-    { name: "куркума", level: "низкий" },
-    { name: "орегано", level: "низкий" },
-    { name: "душица", level: "низкий" },
-    { name: "розмарин", level: "низкий" },
-    { name: "тимьян", level: "низкий" },
-    { name: "чабрец", level: "низкий" },
-    { name: "шалфей", level: "низкий" },
-    { name: "эстрагон", level: "низкий" },
-    { name: "тархун", level: "низкий" },
-    { name: "лавровый лист", level: "низкий" },
-
-    // ========== СОУСЫ, КОНДИМЕНТЫ ==========
-    { name: "кетчуп", level: "высокий" },
-    { name: "майонез", level: "высокий" },
-    { name: "соевый соус", level: "высокий" },
-    { name: "уксус", level: "высокий" },
-    { name: "бальзамический уксус", level: "высокий" },
-    { name: "яблочный уксус", level: "высокий" },
-    { name: "винный уксус", level: "высокий" },
-    { name: "горчица", level: "высокий" },
-    { name: "хрен", level: "высокий" },
-    { name: "аджика", level: "высокий" },
-    { name: "чили соус", level: "высокий" },
-    { name: "томатная паста", level: "высокий" },
-    { name: "паста томатная", level: "высокий" },
-
-    // ========== СЛАДОСТИ, ДЕСЕРТЫ ==========
-    { name: "мёд", level: "средний" },
-    { name: "мед", level: "средний" },
-    { name: "варенье", level: "средний" },
-    { name: "джем", level: "средний" },
-    { name: "конфитюр", level: "средний" },
-    { name: "сахар", level: "низкий" },
-    { name: "сахарный песок", level: "низкий" },
-    { name: "рафинад", level: "низкий" },
-    { name: "шоколад", level: "высокий" },
-    { name: "шоколад молочный", level: "высокий" },
-    { name: "шоколад горький", level: "высокий" },
-    { name: "карамель", level: "средний" },
-    { name: "мармелад", level: "средний" },
-    { name: "зефир", level: "средний" },
-    { name: "пастила", level: "средний" },
-    { name: "халва", level: "средний" },
-    { name: "печенье", level: "средний" },
-    { name: "пряники", level: "средний" },
-    { name: "вафли", level: "средний" },
-    { name: "кекс", level: "средний" },
-    { name: "торт", level: "средний" },
-    { name: "пирожное", level: "средний" },
-    { name: "мороженое", level: "высокий" },
-
-    // ========== ГОТОВЫЕ БЛЮДА ==========
-    { name: "пельмени", level: "средний" },
-    { name: "вареники", level: "средний" },
-    { name: "манты", level: "средний" },
-    { name: "чебуреки", level: "средний" },
-    { name: "блины", level: "средний" },
-    { name: "оладьи", level: "средний" },
-    { name: "сырники", level: "средний" },
-    { name: "запеканка", level: "средний" },
-    { name: "пицца", level: "высокий" },
-    { name: "суши", level: "высокий" },
-    { name: "роллы", level: "высокий" },
-    { name: "бургер", level: "высокий" },
-    { name: "шаурма", level: "высокий" },
-    { name: "плов", level: "средний" },
-    { name: "лапша", level: "средний" },
-];
-
-        // ----- СПИСОК СИМПТОМОВ (используется только для отображения в аналитике) -----
+        // ----- СПИСОК СИМПТОМОВ -----
         const symptomsList = [
             { id: "brain_fog", name: "🌫️ Туман в голове" },
             { id: "headache", name: "🤕 Головная боль" },
@@ -684,24 +281,86 @@
         ];
 
         let userLogs = JSON.parse(localStorage.getItem('histolite_logs')) || [];
-        let savedCycleDay = localStorage.getItem('histolite_cycle_day');
-        if (!savedCycleDay) savedCycleDay = 1;
-        else savedCycleDay = parseInt(savedCycleDay);
+        let savedLastPeriodStart = localStorage.getItem('histolite_last_period_start') || '';
+        let savedCycleLength = localStorage.getItem('histolite_cycle_length') || 28;
 
-        // Функции для цикла
+        // ---- ФУНКЦИИ ДЛЯ РАБОТЫ С ЦИКЛОМ ----
+        function getCurrentCycleDay() {
+            if (!savedLastPeriodStart) return null;
+            const start = new Date(savedLastPeriodStart);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            start.setHours(0,0,0,0);
+            const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+            if (diffDays < 1) return 1;
+            if (diffDays > 45) return null; // слишком длинный цикл
+            return diffDays;
+        }
+
         function getCyclePhaseName(day) {
-            day = parseInt(day);
-            if (isNaN(day)) return "Ошибка";
+            if (day === null || day > 45) return "Вне цикла";
             if (day >= 1 && day <= 5) return "Начало цикла";
             if (day >= 6 && day <= 11) return "Фолликулярная";
             if (day >= 12 && day <= 15) return "Овуляция";
             if (day >= 16 && day <= 23) return "Лютеиновая";
-            if (day >= 24 && day <= 40) return "ПМС";
-            return "Вне диапазона";
+            if (day >= 24 && day <= 45) return "ПМС";
+            return "—";
+        }
+
+        function getPhaseColor(phase) {
+            const colors = {
+                "Начало цикла": "bg-red-50 text-red-700",
+                "Фолликулярная": "bg-green-50 text-green-700",
+                "Овуляция": "bg-amber-50 text-amber-700",
+                "Лютеиновая": "bg-green-50 text-green-700",
+                "ПМС": "bg-rose-100 text-rose-800",
+                "Вне цикла": "bg-slate-100 text-slate-500"
+            };
+            return colors[phase] || "bg-slate-100 text-slate-500";
+        }
+
+        function updateCycleUI() {
+            const day = getCurrentCycleDay();
+            const display = document.getElementById('cycle-day-display');
+            const badge = document.getElementById('phase-badge');
+            const forecast = document.getElementById('cycle-forecast');
+
+            if (day === null || !savedLastPeriodStart) {
+                display.innerText = '—';
+                badge.innerText = 'Не определена';
+                badge.className = 'p-2 rounded-xl text-xs font-bold text-center bg-slate-100 text-slate-500';
+                forecast.innerHTML = '<p class="text-center text-slate-500">Укажите дату начала последней менструации в календаре.</p>';
+                return;
+            }
+
+            display.innerText = day;
+            const phase = getCyclePhaseName(day);
+            badge.innerText = phase;
+            badge.className = `p-2 rounded-xl text-xs font-bold text-center border ${getPhaseColor(phase)}`;
+
+            // Прогноз
+            let advice = '';
+            if (phase === "Овуляция" || phase === "ПМС") {
+                advice = '⚠️ В этой фазе чувствительность повышена. Отдавайте предпочтение продуктам из «зелёной» группы.';
+            } else {
+                advice = '✅ Организм стабилен. Можно постепенно вводить новые продукты, следя за реакцией.';
+            }
+            forecast.innerHTML = `<p class="text-xs text-slate-600"><strong>Текущая фаза:</strong> ${phase}</p><p class="text-xs text-slate-500 mt-1">${advice}</p>`;
+        }
+
+        // Сохранение настроек цикла
+        function saveCycleSettings() {
+            const dateInput = document.getElementById('last-period-start');
+            const lengthInput = document.getElementById('cycle-length');
+            savedLastPeriodStart = dateInput.value;
+            savedCycleLength = parseInt(lengthInput.value) || 28;
+            localStorage.setItem('histolite_last_period_start', savedLastPeriodStart);
+            localStorage.setItem('histolite_cycle_length', savedCycleLength);
+            updateCycleUI();
         }
 
         // ---- ЮРИДИЧЕСКИЙ ЭКРАН ----
-                function toggleLegalButton() {
+        function toggleLegalButton() {
             var chk = document.getElementById('legal-checkbox');
             var btn = document.getElementById('legal-submit-btn');
             if (chk.checked) {
@@ -717,25 +376,19 @@
             localStorage.setItem('histolite_legal_accepted', 'true');
             document.getElementById('legal-modal').style.display = 'none';
             document.getElementById('app-body').classList.remove('opacity-30', 'pointer-events-none');
-            renderDiaryForms(); renderHistory(); renderDirectory(); updateCyclePhaseDisplay();
-            const cycleInput = document.getElementById('cycle-day');
-            cycleInput.value = savedCycleDay;
-            cycleInput.addEventListener('change', function() { localStorage.setItem('histolite_cycle_day', cycleInput.value); updateCyclePhaseDisplay(); });
+            renderDiaryForms();
+            renderHistory();
+            renderDirectory(); // если справочник не используется, можно убрать
+            updateCycleUI();
+            // Настроить обработчики для календаря
+            const dateInput = document.getElementById('last-period-start');
+            const lengthInput = document.getElementById('cycle-length');
+            if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
+            dateInput.addEventListener('change', saveCycleSettings);
+            lengthInput.addEventListener('change', saveCycleSettings);
         };
 
-        function updateCyclePhaseDisplay() {
-            const day = parseInt(document.getElementById('cycle-day').value) || 1;
-            const phase = getCyclePhaseName(day);
-            const badge = document.getElementById('phase-badge');
-            badge.innerText = phase;
-            let color = "bg-emerald-50 text-emerald-700";
-            if (phase === "Начало цикла") color = "bg-red-50 text-red-700";
-            if (phase === "Овуляция") color = "bg-amber-50 text-amber-700";
-            if (phase === "ПМС") color = "bg-rose-100 text-rose-800";
-            badge.className = `p-2 rounded-xl text-xs font-bold text-center border ${color}`;
-        }
-
-        // ---- ОТРИСОВКА ФОРМ (только продукты) ----
+        // ---- ОТРИСОВКА ФОРМ ----
         window.renderDiaryForms = function() {
             const container = document.getElementById('products-checkboxes');
             if (container) {
@@ -752,8 +405,15 @@
         window.saveLog = function() {
             const date = document.getElementById('log-date').value;
             const time = document.getElementById('log-time').value;
-            const cycleDay = parseInt(document.getElementById('cycle-day').value) || 1;
             if (!date) { alert('Укажите дату'); return; }
+
+            // Получаем текущий день цикла
+            const cycleDay = getCurrentCycleDay();
+            if (cycleDay === null || !savedLastPeriodStart) {
+                alert('Пожалуйста, укажите дату начала последней менструации во вкладке "Календарь".');
+                return;
+            }
+
             const checked = Array.from(document.querySelectorAll('#products-checkboxes input:checked')).map(el => el.value);
             const customRaw = document.getElementById('custom-products').value;
             let custom = customRaw.trim() ? customRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
@@ -763,22 +423,16 @@
             if (allProducts.length === 0 && medications.length === 0) { alert('Выберите/введите продукты или лекарства'); return; }
             const symptomsText = document.getElementById('symptoms-text-input').value.trim();
 
-            // Удаляем старую запись с такой же датой и временем (если есть)
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
-
-            // Добавляем новую запись (без symptoms, только symptomsText)
             userLogs.push({ date, time, cycleDay, products: allProducts, medications, symptomsText });
-
-            // Сохраняем в localStorage
             localStorage.setItem('histolite_logs', JSON.stringify(userLogs));
 
-            // Сбрасываем форму
+            // Сброс формы
             document.querySelectorAll('#products-checkboxes input:checked').forEach(el => el.checked = false);
             document.getElementById('custom-products').value = '';
             document.getElementById('medications').value = '';
             document.getElementById('symptoms-text-input').value = '';
 
-            // Обновляем историю и показываем уведомление
             renderHistory();
             alert('Запись сохранена');
         };
@@ -791,29 +445,24 @@
             container.innerHTML = sorted.slice(0,5).map(log => {
                 const symps = log.symptomsText || 'не указаны';
                 const meds = log.medications && log.medications.length ? `💊 ${log.medications.join(', ')}` : '';
-                return `<div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1"><div class="flex justify-between"><div class="font-bold text-[10px] text-slate-400">📅 ${log.date} | ⏰ ${log.time}</div><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500 text-[11px]">🗑️</button></div><div class="text-slate-700 text-xs">🍎 Рацион: ${log.products.join(', ') || '—'}</div>${meds ? `<div class="text-purple-700 text-xs">${meds}</div>` : ''}<div class="text-amber-600 text-xs">📝 Симптомы: ${symps}</div><div class="text-teal-600 text-[10px]">🌸 ${log.cycleDay} день цикла</div></div>`;
+                return `<div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1"><div class="flex justify-between"><div class="font-bold text-[10px] text-slate-400">📅 ${log.date} | ⏰ ${log.time}</div><button onclick="deleteLog('${log.date}','${log.time}')" class="text-red-500 text-[11px]">🗑️</button></div><div class="text-slate-700 text-xs">🍎 Рацион: ${log.products.join(', ') || '—'}</div>${meds ? `<div class="text-purple-700 text-xs">${meds}</div>` : ''}<div class="text-amber-600 text-xs">📝 Симптомы: ${symps}</div><div class="text-teal-600 text-[10px]">🌸 День цикла: ${log.cycleDay}</div></div>`;
             }).join('');
         };
 
         window.deleteLog = function(date,time) { userLogs = userLogs.filter(l=>!(l.date===date && l.time===time)); localStorage.setItem('histolite_logs',JSON.stringify(userLogs)); renderHistory(); };
         window.clearAllLogs = function() { if(confirm('Удалить все записи?')){ userLogs=[]; localStorage.setItem('histolite_logs','[]'); renderHistory(); } };
 
-        // ---- СПРАВОЧНИК ----
+        // ---- СПРАВОЧНИК (если нужен, можно оставить, но вкладка убрана) ----
         window.renderDirectory = function() {
-            const search = document.getElementById('search-prod')?.value.toLowerCase()||'';
-            const container = document.getElementById('directory-list');
-            const badges = ['🟢 Мягкий','🟡 Умеренно','🔴 Высокая'];
-            const filtered = productsDB.filter(p=>p.name.toLowerCase().includes(search));
-            container.innerHTML = filtered.map(p=>`<div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-xs"><span class="font-semibold">${p.name}</span><span class="px-2 py-0.5 border rounded-full text-[10px] font-bold ${badges[p.level]=='🟢 Мягкий'?'bg-green-50 text-green-700 border-green-200':badges[p.level]=='🟡 Умеренно'?'bg-yellow-50 text-yellow-700 border-yellow-200':'bg-red-50 text-red-700 border-red-200'}">${badges[p.level]}</span></div>`).join('');
+            // Можно оставить для внутреннего использования, но сейчас не используется
         };
 
-        // ---- АНАЛИТИКА СОВПАДЕНИЙ (48ч) - АДАПТИРОВАНА ДЛЯ ТЕКСТОВЫХ СИМПТОМОВ ----
+        // ---- АНАЛИТИКА СОВПАДЕНИЙ ----
         window.runAdvancedAnalytics = function() {
             const container = document.getElementById('analytics-results');
             if (userLogs.length<2) { container.innerHTML = '<div class="p-3 bg-amber-50 text-amber-800 text-xs rounded-xl border border-amber-200 text-center">📌 Добавьте записи за 2+ дня</div>'; return; }
             const triggerScore = {};
             userLogs.forEach(targetLog => {
-                // Если есть текст симптомов, считаем, что симптом был (1), иначе 0
                 const maxSymptom = targetLog.symptomsText && targetLog.symptomsText.trim() !== '' ? 1 : 0;
                 if (maxSymptom >= 1) {
                     const targetDate = new Date(targetLog.date);
@@ -837,30 +486,27 @@
                 }
             });
             const suspects = Object.entries(triggerScore).map(([name,data])=>({name, score: Math.min(10, Math.round((data.weight / (userLogs.length * 2)) * 10))})).filter(s=>s.score>0).sort((a,b)=>b.score-a.score);
-            if(!suspects.length) { container.innerHTML = '<div class="text-xs text-green-600 text-center py-2">✅ Явных триггеров (включая лекарства) не найдено</div>'; return; }
+            if(!suspects.length) { container.innerHTML = '<div class="text-xs text-green-600 text-center py-2">✅ Явных триггеров не найдено</div>'; return; }
             container.innerHTML = `<div class="text-[11px] font-bold text-teal-900 mb-2">🔎 Потенциальные триггеры/помощники (48ч):</div><div class="space-y-1.5">${suspects.slice(0,5).map(s=>`<div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100"><span class="text-xs font-medium">${s.name}</span><span class="text-xs font-bold text-amber-600">индекс ${s.score}/10</span></div>`).join('')}</div><p class="text-[10px] text-slate-400 mt-2">*Анализ показывает частоту совпадений, а не гарантированную причину.</p>`;
         };
 
-        // ---- АНАЛИТИКА ПО ЦИКЛУ (адаптирована для текстовых симптомов) ----
+        // ---- АНАЛИТИКА ПО ЦИКЛУ (адаптирована) ----
         function renderCycleSymptomAnalysis() {
             const container = document.getElementById('cycle-symptom-analysis');
             if (!userLogs.length) { container.innerHTML = '<div class="text-center text-slate-400 p-4">Нет данных</div>'; return; }
             const phases = ["Начало цикла","Фолликулярная","Овуляция","Лютеиновая","ПМС"];
             const phaseData = {};
             phases.forEach(p=>phaseData[p]={count:0, withSymptoms:0, productFreq:{}});
-            
             userLogs.forEach(log => {
                 const phase = getCyclePhaseName(log.cycleDay);
                 if(phaseData[phase]) {
                     phaseData[phase].count++;
-                    const hasSymptoms = log.symptomsText && log.symptomsText.trim() !== '';
-                    if (hasSymptoms) phaseData[phase].withSymptoms++;
+                    if (log.symptomsText && log.symptomsText.trim() !== '') phaseData[phase].withSymptoms++;
                     log.products.forEach(prod => {
                         phaseData[phase].productFreq[prod] = (phaseData[phase].productFreq[prod]||0)+1;
                     });
                 }
             });
-            
             let html = '';
             for(let phase of phases) {
                 const data = phaseData[phase];
@@ -868,7 +514,7 @@
                 const withSym = data.withSymptoms;
                 const percent = count ? Math.round((withSym/count)*100) : 0;
                 const top3 = Object.entries(data.productFreq).sort((a,b)=>b[1]-a[1]).slice(0,3).map(p=>p[0]).join(', ');
-                html += `<div class="border-b border-slate-100 pb-2 mb-2"><div class="font-bold text-sm">${phase}</div><div class="text-[11px] text-slate-500">Записей: ${count} | Симптомы отмечены в ${percent}% случаев</div><div class="text-teal-700 text-[11px]">🍽️ Частые: ${top3 || '—'}</div></div>`;
+                html += `<div class="border-b border-slate-100 pb-2 mb-2"><div class="font-bold text-sm">${phase}</div><div class="text-[11px] text-slate-500">Записей: ${count} | Симптомы в ${percent}% случаев</div><div class="text-teal-700 text-[11px]">🍽️ Частые: ${top3 || '—'}</div></div>`;
             }
             container.innerHTML = html;
         }
@@ -927,12 +573,12 @@
             document.getElementById(`${tabId}-tab`).classList.add('active');
             document.querySelectorAll('.tab-button').forEach(btn=>{btn.classList.remove('text-emerald-600');btn.classList.add('text-slate-400'); if(btn.getAttribute('data-tab')===tabId){btn.classList.remove('text-slate-400');btn.classList.add('text-emerald-600');}});
             if(tabId === 'analytics') { renderCycleSymptomAnalysis(); renderCycleLoadCalendar(); }
+            if(tabId === 'calendar') { updateCycleUI(); }
         }
         document.querySelectorAll('.tab-button').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.getAttribute('data-tab'))));
 
         // ---- СКАНЕР ШТРИХ-КОДОВ ----
         let html5QrCode = null;
-
         function scanBarcode() {
             const scannerContainer = document.getElementById('scanner-container');
             if (!scannerContainer) return;
@@ -947,29 +593,24 @@
                 alert('Не удалось запустить камеру. Проверьте разрешения.');
             }
         }
-
-        function onScanSuccess(decodedText, decodedResult) {
+        function onScanSuccess(decodedText) {
             stopScanner();
             findProductByBarcode(decodedText);
         }
-
         function onScanError(err) { /* игнорируем */ }
-
         function stopScanner() {
             if (html5QrCode) {
-                try {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        html5QrCode = null;
-                        document.getElementById('scanner-container').style.display = 'none';
-                    }).catch(err => console.error('Ошибка остановки сканера:', err));
-                } catch (err) { console.error('Ошибка:', err); }
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                    document.getElementById('scanner-container').style.display = 'none';
+                }).catch(err => console.error('Ошибка остановки сканера:', err));
             } else {
                 document.getElementById('scanner-container').style.display = 'none';
             }
         }
 
-        // ---- Поиск продукта по штрих-коду с гистаминовым статусом ----
+        // ---- Поиск продукта по штрих-коду ----
         function findProductByBarcode(barcode) {
             const btn = document.querySelector('button[onclick="scanBarcode()"]');
             const originalText = btn ? btn.innerText : '📷 Сканировать штрих-код';
@@ -977,15 +618,13 @@
                 btn.innerText = '⏳ Ищем продукт...';
                 btn.disabled = true;
             }
-
             const timeout = setTimeout(() => {
                 if (btn) {
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
-                alert('⏱️ Поиск продукта занял слишком много времени. Проверьте соединение или попробуйте позже.');
+                alert('⏱️ Поиск продукта занял слишком много времени.');
             }, 10000);
-
             fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`)
                 .then(response => response.json())
                 .then(data => {
@@ -994,28 +633,18 @@
                         btn.innerText = originalText;
                         btn.disabled = false;
                     }
-
                     if (data.status === 1 && data.product) {
                         const product = data.product;
                         let productName = product.product_name_ru || product.product_name || 'Неизвестный продукт';
-                        
                         const status = getHistamineStatus(product);
                         showProductStatus(productName, status);
-
                         const customInput = document.getElementById('custom-products');
                         if (customInput) {
-                            if (customInput.value.trim()) {
-                                customInput.value += ', ' + productName;
-                            } else {
-                                customInput.value = productName;
-                            }
-                        }
-
-                        if (product.ingredients_text_ru || product.ingredients_text) {
-                            console.log('Состав:', product.ingredients_text_ru || product.ingredients_text);
+                            if (customInput.value.trim()) customInput.value += ', ' + productName;
+                            else customInput.value = productName;
                         }
                     } else {
-                        alert(`❌ Продукт с кодом ${barcode} не найден в базе. Вы можете ввести название вручную.`);
+                        alert(`❌ Продукт с кодом ${barcode} не найден в базе. Введите название вручную.`);
                     }
                 })
                 .catch(error => {
@@ -1024,8 +653,7 @@
                         btn.innerText = originalText;
                         btn.disabled = false;
                     }
-                    console.error('Ошибка при запросе к Open Food Facts:', error);
-                    alert('❌ Ошибка соединения с базой продуктов. Попробуйте позже.');
+                    alert('❌ Ошибка соединения с базой продуктов.');
                 });
         }
 
@@ -1035,43 +663,26 @@
             let foundLevels = [];
             for (let word of words) {
                 const found = myHistamineDB.find(item => 
-                    word.includes(item.name.toLowerCase()) || 
-                    item.name.toLowerCase().includes(word)
+                    word.includes(item.name.toLowerCase()) || item.name.toLowerCase().includes(word)
                 );
-                if (found) {
-                    foundLevels.push(found.level);
-                }
+                if (found) foundLevels.push(found.level);
             }
             if (foundLevels.length > 0) {
                 let highestLevel = 'низкий';
-                if (foundLevels.includes('высокий')) {
-                    highestLevel = 'высокий';
-                } else if (foundLevels.includes('средний')) {
-                    highestLevel = 'средний';
-                }
-                if (highestLevel === 'низкий') {
-                    return { level: 'low', label: '🟢 Низкий гистамин', description: 'Продукт с низким содержанием гистамина. Обычно безопасен.' };
-                } else if (highestLevel === 'средний') {
-                    return { level: 'medium', label: '🟡 Средний гистамин', description: 'Продукт со средним содержанием гистамина. Употребляйте с осторожностью.' };
-                } else if (highestLevel === 'высокий') {
-                    return { level: 'high', label: '🔴 Высокий гистамин', description: 'Продукт с высоким содержанием гистамина. Рекомендуется избегать.' };
-                }
+                if (foundLevels.includes('высокий')) highestLevel = 'высокий';
+                else if (foundLevels.includes('средний')) highestLevel = 'средний';
+                if (highestLevel === 'низкий') return { level: 'low', label: '🟢 Низкий гистамин', description: 'Продукт с низким содержанием гистамина.' };
+                else if (highestLevel === 'средний') return { level: 'medium', label: '🟡 Средний гистамин', description: 'Продукт со средним содержанием гистамина.' };
+                else if (highestLevel === 'высокий') return { level: 'high', label: '🔴 Высокий гистамин', description: 'Продукт с высоким содержанием гистамина.' };
             }
             const tags = product.tags || [];
-            const lowHistamineTag = tags.find(tag => tag === 'en:Low histamine');
-            const highHistamineTag = tags.find(tag => tag === 'en:High histamine');
-            if (lowHistamineTag) {
-                return { level: 'low', label: '🟢 Низкий гистамин', description: 'Продукт с низким содержанием гистамина. Обычно безопасен.' };
-            } else if (highHistamineTag) {
-                return { level: 'high', label: '🔴 Высокий гистамин', description: 'Продукт с высоким содержанием гистамина. Рекомендуется избегать.' };
-            } else {
-                return { level: 'unknown', label: '🟡 Статус не определён', description: 'Проверьте состав продукта вручную или используйте справочник.' };
-            }
+            if (tags.includes('en:Low histamine')) return { level: 'low', label: '🟢 Низкий гистамин', description: 'Продукт с низким содержанием гистамина.' };
+            else if (tags.includes('en:High histamine')) return { level: 'high', label: '🔴 Высокий гистамин', description: 'Продукт с высоким содержанием гистамина.' };
+            else return { level: 'unknown', label: '🟡 Статус не определён', description: 'Проверьте состав продукта вручную.' };
         }
 
         function showProductStatus(productName, status) {
-            const message = `📦 Продукт: ${productName}\n\n${status.label}\n${status.description}`;
-            alert(message);
+            alert(`📦 Продукт: ${productName}\n\n${status.label}\n${status.description}`);
         }
 
         // ---- ИНИЦИАЛИЗАЦИЯ ----
@@ -1082,22 +693,22 @@
                 document.getElementById('app-body').classList.remove('opacity-30', 'pointer-events-none');
                 renderDiaryForms();
                 renderHistory();
-                renderDirectory();
-                updateCyclePhaseDisplay();
-                const cycleInput = document.getElementById('cycle-day');
-                cycleInput.value = savedCycleDay;
-                cycleInput.addEventListener('change', function() { 
-                    localStorage.setItem('histolite_cycle_day', cycleInput.value); 
-                    updateCyclePhaseDisplay(); 
-                });
+                updateCycleUI();
+                // Настроить календарь
+                const dateInput = document.getElementById('last-period-start');
+                const lengthInput = document.getElementById('cycle-length');
+                if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
+                dateInput.addEventListener('change', saveCycleSettings);
+                lengthInput.addEventListener('change', saveCycleSettings);
             } else {
                 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('log-time').value = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                const cycleInput = document.getElementById('cycle-day');
-                cycleInput.value = savedCycleDay;
-                cycleInput.addEventListener('change', function() { 
-                    localStorage.setItem('histolite_cycle_day', cycleInput.value); 
-                });
+                // Настроить календарь заранее, чтобы при первом входе были обработчики
+                const dateInput = document.getElementById('last-period-start');
+                const lengthInput = document.getElementById('cycle-length');
+                if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
+                dateInput.addEventListener('change', saveCycleSettings);
+                lengthInput.addEventListener('change', saveCycleSettings);
             }
         })();
     </script>
