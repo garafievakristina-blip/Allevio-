@@ -81,26 +81,29 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Выберите продукты из списка:</label>
-                        <div id="products-checkboxes" class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2 border border-slate-100 rounded-xl bg-slate-50 text-xs"></div>
-                    </div>
+                    
 
-                    <div class="mb-4">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Или введите свои продукты (через запятую):</label>
-                        <input type="text" id="custom-products" placeholder="кинза, тофу, батат" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                    </div>
+                   <div class="mb-4">
+    <label class="block text-xs font-bold text-slate-600 mb-1">Введите продукты (через запятую):</label>
+    <div class="flex gap-2 items-center">
+        <input type="text" id="custom-products" placeholder="например: курица, рис, кабачок" class="flex-1 p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+        <button onclick="startVoiceInput('custom-products')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-xl transition text-sm" title="Голосовой ввод">🎤</button>
+    </div>
+</div>
 
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">💊 Принятые лекарства (через запятую):</label>
                         <input type="text" id="medications" placeholder="цетиризин 10мг, дао-форте" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                     </div>
 
-                    <div class="space-y-2 border-t border-slate-100 pt-3">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">📝 Какие симптомы вы испытываете? (через запятую)</label>
-                        <input type="text" id="symptoms-text-input" placeholder="например: головная боль, усталость, зуд" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                        <p class="text-[10px] text-slate-400 mt-1">Записывайте симптомы, чтобы отслеживать их связь с циклом.</p>
-                    </div>
+                   <div class="space-y-2 border-t border-slate-100 pt-3">
+    <label class="block text-xs font-bold text-slate-600 mb-1">📝 Какие симптомы вы испытываете? (через запятую)</label>
+    <div class="flex gap-2 items-center">
+        <input type="text" id="symptoms-text-input" placeholder="например: головная боль, усталость, зуд" class="flex-1 p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+        <button onclick="startVoiceInput('symptoms-text-input')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-xl transition text-sm" title="Голосовой ввод">🎤</button>
+    </div>
+    <p class="text-[10px] text-slate-400 mt-1">Нажмите на микрофон и скажите текст.</p>
+</div>
 
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">Сохранить запись</button>
                 </div>
@@ -125,13 +128,22 @@
                             <button onclick="searchProductByName()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm">Найти</button>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <button onclick="scanBarcodeForSearch()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm">📷 Сканировать штрих-код</button>
-                    </div>
-                    <div id="scanner-search-container" style="display: none; margin-bottom: 15px;">
-                        <div id="qr-reader-search" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-                        <button onclick="stopSearchScanner()" class="w-full mt-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition text-sm">❌ Закрыть сканер</button>
-                    </div>
+                    <div class="mb-4 flex gap-2 flex-wrap">
+    <button onclick="scanBarcode()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">
+        📷 Сканировать камерой
+    </button>
+    <button onclick="uploadBarcodeImage()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">
+        📤 Загрузить фото
+    </button>
+</div>
+<input type="file" id="barcode-image-input" accept="image/*" style="display:none" onchange="decodeBarcodeFromImage(this)">
+
+<div id="scanner-container" style="display: none; margin-bottom: 15px;">
+    <div id="qr-reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+    <button onclick="stopScanner()" class="w-full mt-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition text-sm">
+        ❌ Закрыть сканер
+    </button>
+</div>
                     <div id="product-search-result" class="hidden"></div>
                 </div>
             </div>
@@ -794,27 +806,18 @@
         };
 
         // ---- ОТРИСОВКА ФОРМ ----
-        window.renderDiaryForms = function() {
-            const container = document.getElementById('products-checkboxes');
-            if (container) {
-                container.innerHTML = productsDB.map(p => `
-                    <label class="flex items-center gap-1.5 p-1.5 bg-white rounded-xl border border-slate-100 cursor-pointer select-none">
-                        <input type="checkbox" value="${p.name}" class="product-checkbox accent-emerald-600 rounded">
-                        <span class="truncate text-xs">${p.name}</span>
-                    </label>
-                `).join('');
-            }
-        };
-
+              window.renderDiaryForms = function() {
+            // Больше не нужна, оставлена для совместимости
+        }; 
         // ---- СОХРАНЕНИЕ ЗАПИСИ ----
         window.saveLog = function() {
             const date = document.getElementById('log-date').value;
             const time = document.getElementById('log-time').value;
-            if (!date) { alert('Укажите дату'); return; }
+            if (!date) { showModal('Укажите дату'); return; }
 
             const cycleDay = getCurrentCycleDay();
             if (cycleDay === null || !savedLastPeriodStart) {
-                alert('Сначала настройте календарь цикла (укажите дату начала менструации).');
+                showModal('Сначала настройте календарь цикла (укажите дату начала менструации).');
                 return;
             }
 
@@ -824,7 +827,7 @@
             let allProducts = [...new Set([...checked, ...custom])];
             const medsRaw = document.getElementById('medications').value;
             let medications = medsRaw.trim() ? medsRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
-            if (allProducts.length === 0 && medications.length === 0) { alert('Выберите/введите продукты или лекарства'); return; }
+            if (allProducts.length === 0 && medications.length === 0) { showModal('Выберите/введите продукты или лекарства'); return; }
             const symptomsText = document.getElementById('symptoms-text-input').value.trim();
 
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
@@ -837,7 +840,7 @@
             document.getElementById('symptoms-text-input').value = '';
 
             renderHistory();
-            alert('Запись сохранена');
+            showModal('Запись сохранена');
         };
 
         // ---- ИСТОРИЯ ----
@@ -902,7 +905,7 @@
         window.searchProductByName = function() {
             const input = document.getElementById('product-search-input');
             const query = input.value.trim().toLowerCase();
-            if (!query) { alert('Введите название продукта'); return; }
+            if (!query) { showModal('Введите название продукта'); return; }
             const resultDiv = document.getElementById('product-search-result');
             resultDiv.classList.remove('hidden', 'low', 'medium', 'high', 'unknown');
             resultDiv.innerHTML = '';
@@ -948,7 +951,7 @@
                 html5QrCodeSearch.start({ facingMode: "environment" }, config, onSearchScanSuccess, onSearchScanError);
             } catch (err) {
                 console.error('Ошибка запуска сканера:', err);
-                alert('Не удалось запустить камеру.');
+                showModal('Не удалось запустить камеру.');
             }
         };
 
@@ -982,10 +985,10 @@
                         // Автозаполнение поля поиска для удобства
                         document.getElementById('product-search-input').value = productName;
                     } else {
-                        alert('❌ Продукт не найден по штрих-коду.');
+                        showModal('❌ Продукт не найден по штрих-коду.');
                     }
                 })
-                .catch(() => alert('❌ Ошибка соединения с базой продуктов.'));
+                .catch(() => showModal('❌ Ошибка соединения с базой продуктов.'));
         }
 
         function onSearchScanError(err) {}
@@ -1094,7 +1097,7 @@
 
         // ---- ЭКСПОРТ CSV ----
         window.exportToCSV = function() {
-            if(!userLogs.length) { alert('Нет записей'); return; }
+            if(!userLogs.length) { showModal('Нет записей'); return; }
             let rows = [['Дата','Время','День цикла','Фаза','Продукты','Лекарства','Симптомы']];
             userLogs.forEach(log => {
                 const phase = getCyclePhaseName(log.cycleDay);
@@ -1143,6 +1146,74 @@
                 lengthInput.addEventListener('change', saveCycleSettings);
             }
         })();
+       // ---- ГОЛОСОВОЙ ВВОД ----
+let recognition = null;
+
+function startVoiceInput(fieldId) {
+    // Проверка поддержки браузером
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showModal('Ваш браузер не поддерживает голосовой ввод. Используйте Chrome или Edge.');
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onresult = function(event) {
+        let finalText = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalText += transcript;
+            } else {
+                // Промежуточные результаты (можно показать, но мы просто добавим в конец)
+                // Для простоты добавим всё сразу
+            }
+        }
+        if (finalText) {
+            const input = document.getElementById(fieldId);
+            if (input) {
+                // Если в поле уже что-то есть, добавим через запятую
+                if (input.value.trim()) {
+                    input.value += ', ' + finalText.trim();
+                } else {
+                    input.value = finalText.trim();
+                }
+            }
+        }
+    };
+
+    recognition.onerror = function(event) {
+        console.error('Ошибка распознавания:', event.error);
+        showModal('Ошибка распознавания: ' + event.error + '. Попробуйте ещё раз.');
+    };
+
+    recognition.onend = function() {
+        console.log('Голосовой ввод завершён');
+        // Кнопка становится активной снова (можно по таймеру)
+    };
+
+    recognition.start();
+} 
+                // ---- МОДАЛЬНОЕ ОКНО ДЛЯ СООБЩЕНИЙ ----
+        function showModal(message) {
+            document.getElementById('custom-modal-message').innerText = message;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
     </script>
+<!-- Модальное окно для сообщений -->
+<div id="custom-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+        <p id="custom-modal-message" class="text-center text-sm text-slate-700 mb-4">Сообщение</p>
+        <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm">OK</button>
+    </div>
+</div>
 </body>
 </html>
