@@ -160,8 +160,13 @@
                         <div>
                             <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Длительность цикла (дней)</label>
                             <input type="number" id="cycle-length" min="20" max="45" value="28" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                        </div>
+                       
                     </div>
+                    <div class="mb-4">
+    <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">ПМС начинается за (дней до цикла)</label>
+    <input type="number" id="pms-start-days" min="1" max="14" value="7" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
+    <p class="text-[9px] text-slate-400 mt-1">Например, если ПМС начинается за 10 дней до менструации — поставьте 10.</p>
+</div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Текущий день цикла</label>
@@ -706,7 +711,7 @@
 
         let userLogs = JSON.parse(localStorage.getItem('histolite_logs')) || [];
         let savedLastPeriodStart = localStorage.getItem('histolite_last_period_start') || '';
-        let savedCycleLength = localStorage.getItem('histolite_cycle_length') || 28;
+        let savedCycleLength = localStorage.getItem('histolite_cycle_length') || 28; let savedPmsStartDays = localStorage.getItem('histolite_pms_start_days') || 7;
 
         // ---- ФУНКЦИИ ДЛЯ РАБОТЫ С ЦИКЛОМ ----
         function getCurrentCycleDay() {
@@ -721,13 +726,19 @@
             return diffDays;
         }
 
-        function getCyclePhaseName(day) {
-            if (day === null || day > 45) return "Вне цикла";
-            if (day >= 1 && day <= 5) return "Начало цикла";
-            if (day >= 6 && day <= 11) return "Фолликулярная";
-            if (day >= 12 && day <= 15) return "Овуляция";
-            if (day >= 16 && day <= 23) return "Лютеиновая";
-            if (day >= 24 && day <= 45) return "ПМС";
+                function getCyclePhaseName(day) {
+            if (day === null || day > savedCycleLength) return "Вне цикла";
+            const len = savedCycleLength;
+            // Овуляция обычно происходит за 14 дней до конца цикла
+            const ovulationDay = len - 14;
+            // ПМС начинается за 5 дней до конца
+           const pmsStart = len - savedPmsStartDays;
+
+            if (day <= 5) return "Начало цикла";
+            if (day >= 6 && day < ovulationDay) return "Фолликулярная";
+            if (day >= ovulationDay && day <= ovulationDay + 1) return "Овуляция"; // даём 2 дня на овуляцию
+            if (day > ovulationDay + 1 && day < pmsStart) return "Лютеиновая";
+            if (day >= pmsStart) return "ПМС";
             return "—";
         }
 
@@ -762,19 +773,30 @@
             badge.innerText = phase;
             badge.className = `p-2 rounded-xl text-xs font-bold text-center border ${getPhaseColor(phase)}`;
 
-            let advice = (phase === "Овуляция" || phase === "ПМС") 
-                ? '⚠️ Повышенная чувствительность. Выбирайте зелёные продукты.' 
-                : '✅ Организм стабилен. Можно пробовать новые продукты.';
-            forecast.innerHTML = `<p class="text-xs text-slate-600"><strong>${phase}</strong></p><p class="text-xs text-slate-500 mt-1">${advice}</p>`;
-        }
-
-        function saveCycleSettings() {
+                        let advice = '';
+            let adviceColor = 'text-slate-600';
+            if (phase === "Овуляция" || phase === "ПМС") {
+                advice = '⚠️ Повышенная чувствительность. Выбирайте зелёные продукты.';
+                adviceColor = 'text-amber-700';
+            } else if (phase === "Начало цикла" || phase === "Лютеиновая") {
+                advice = '🟡 Умеренная чувствительность. Следите за реакциями.';
+                adviceColor = 'text-yellow-700';
+            } else {
+                advice = '✅ Организм стабилен. Можно пробовать новые продукты.';
+                adviceColor = 'text-emerald-700';
+            }
+            forecast.innerHTML = `<p class="text-xs text-slate-600"><strong>Текущая фаза: ${phase}</strong></p><p class="text-xs ${adviceColor} mt-1">${advice}</p>`;
+  }
+                function saveCycleSettings() {
             const dateInput = document.getElementById('last-period-start');
             const lengthInput = document.getElementById('cycle-length');
+            const pmsInput = document.getElementById('pms-start-days');
             savedLastPeriodStart = dateInput.value;
             savedCycleLength = parseInt(lengthInput.value) || 28;
+            savedPmsStartDays = parseInt(pmsInput.value) || 7;
             localStorage.setItem('histolite_last_period_start', savedLastPeriodStart);
             localStorage.setItem('histolite_cycle_length', savedCycleLength);
+            localStorage.setItem('histolite_pms_start_days', savedPmsStartDays);
             updateCycleUI();
         }
 
@@ -802,6 +824,10 @@
             if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
             dateInput.addEventListener('change', saveCycleSettings);
             lengthInput.addEventListener('change', saveCycleSettings);
+                        const pmsInput = document.getElementById('pms-start-days');
+            if (savedPmsStartDays) pmsInput.value = savedPmsStartDays;
+            pmsInput.addEventListener('change', saveCycleSettings);
+                           
         };
 
        
@@ -1120,6 +1146,9 @@
                 if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
                 dateInput.addEventListener('change', saveCycleSettings);
                 lengthInput.addEventListener('change', saveCycleSettings);
+                                const pmsInput = document.getElementById('pms-start-days');
+                if (savedPmsStartDays) pmsInput.value = savedPmsStartDays;
+                pmsInput.addEventListener('change', saveCycleSettings);
             } else {
                 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('log-time').value = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -1128,6 +1157,9 @@
                 if (savedLastPeriodStart) dateInput.value = savedLastPeriodStart;
                 dateInput.addEventListener('change', saveCycleSettings);
                 lengthInput.addEventListener('change', saveCycleSettings);
+                                const pmsInput = document.getElementById('pms-start-days');
+                if (savedPmsStartDays) pmsInput.value = savedPmsStartDays;
+                pmsInput.addEventListener('change', saveCycleSettings);
             }
         })();
        // ---- ГОЛОСОВОЙ ВВОД ----
@@ -1241,7 +1273,7 @@ function startVoiceInput(fieldId) {
         }
                 // ---- МОДАЛЬНОЕ ОКНО ДЛЯ СООБЩЕНИЙ ----
         function showModal(message) {
-            document.getElementById('custom-modal-message').innerText = message;
+           document.getElementById('custom-modal-message').innerText = message;
             document.getElementById('custom-modal').style.display = 'flex';
         }
 
