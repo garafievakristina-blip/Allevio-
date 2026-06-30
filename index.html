@@ -54,11 +54,33 @@
             font-size: 24px;
             font-weight: 700;
         }
+        /* Стили для базы продуктов */
+        .product-status-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: white;
+        }
+        .product-status-btn.active-safe { border-color: #4ade80; background: #dcfce7; }
+        .product-status-btn.active-unsafe { border-color: #f87171; background: #fee2e2; }
+        .product-status-btn.active-question { border-color: #facc15; background: #fef9c3; }
+        .product-status-btn:hover { transform: scale(1.05); }
+        .safe-filter-btn { border-radius: 9999px; padding: 4px 12px; font-size: 12px; border: 1px solid #e2e8f0; background: white; cursor: pointer; }
+        .safe-filter-btn.active { background: #10b981; color: white; border-color: #10b981; }
+        .safe-filter-btn.unsafe-active { background: #ef4444; color: white; border-color: #ef4444; }
+        .safe-filter-btn.question-active { background: #f59e0b; color: white; border-color: #f59e0b; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24">
 
-    <!-- ЮРИДИЧЕСКИЙ ЭКРАН + ВЫБОР ПОЛА -->
+    <!-- ЮРИДИЧЕСКИЙ ЭКРАН + ВЫБОР ПОЛА (без изменений) -->
     <div id="legal-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
             <div class="text-center text-3xl mb-2">⚖️</div>
@@ -69,7 +91,6 @@
                 <p><strong>3. Необходимость консультации специалиста.</strong> Любые выводы носят ознакомительный характер.</p>
                 <p><strong>4. Ограничение ответственности.</strong> Разработчик не несет ответственности за последствия использования дневника.</p>
             </div>
-            <!-- ВЫБОР ПОЛА -->
             <div class="mt-2">
                 <label class="block text-xs font-bold text-slate-600 mb-2">Выберите ваш пол:</label>
                 <div class="flex gap-4">
@@ -104,56 +125,33 @@
             <!-- ВКЛАДКА СЕГОДНЯ -->
             <div id="today-tab" class="tab-content active space-y-4">
                 <div id="today-dashboard">
-                    <!-- Карточка риска дня -->
                     <div id="risk-card" class="risk-card risk-low">
                         <div class="text-sm font-bold text-slate-600">📊 Риск симптомов сегодня</div>
                         <div class="text-2xl font-bold" id="risk-level">Низкий</div>
                         <div class="text-xs text-slate-500" id="risk-reason">Фаза цикла: стабильная</div>
                     </div>
-                    <!-- Совет дня -->
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">💡 Совет дня</div>
                         <div id="today-tip" class="text-sm text-slate-700">Сегодня хороший день, чтобы попробовать новые продукты.</div>
                     </div>
-                    <!-- Статистика -->
                     <div class="flex gap-2">
-                        <div class="stat-card">
-                            <div class="text-xs text-slate-400">Записей за 7 дней</div>
-                            <div class="stat-number text-emerald-600" id="week-logs">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="text-xs text-slate-400">Дней подряд</div>
-                            <div class="stat-number text-amber-600" id="streak">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="text-xs text-slate-400">Найдено триггеров</div>
-                            <div class="stat-number text-rose-600" id="triggers-count">0</div>
-                        </div>
+                        <div class="stat-card"><div class="text-xs text-slate-400">Записей за 7 дней</div><div class="stat-number text-emerald-600" id="week-logs">0</div></div>
+                        <div class="stat-card"><div class="text-xs text-slate-400">Дней подряд</div><div class="stat-number text-amber-600" id="streak">0</div></div>
+                        <div class="stat-card"><div class="text-xs text-slate-400">Найдено триггеров</div><div class="stat-number text-rose-600" id="triggers-count">0</div></div>
                     </div>
-                    <!-- Прогресс и цели (вставляется динамически) -->
                     <div id="progress-container"></div>
-                    <!-- Кнопка быстрого добавления -->
-                    <button onclick="switchTab('diary'); document.querySelector('.bg-white.p-4.rounded-2xl.shadow-sm.border').scrollIntoView({ behavior: 'smooth' });" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm shadow-md">
-                        ➕ Добавить запись
-                    </button>
+                    <button onclick="switchTab('diary'); document.querySelector('.bg-white.p-4.rounded-2xl.shadow-sm.border').scrollIntoView({ behavior: 'smooth' });" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-sm shadow-md">➕ Добавить запись</button>
                 </div>
             </div>
 
-            <!-- ВКЛАДКА ДНЕВНИК -->
+            <!-- ВКЛАДКА ДНЕВНИК (без изменений) -->
             <div id="diary-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">📝 Новая запись</h2>
                     <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Дата</label>
-                            <input type="date" id="log-date" class="w-full p-2 border border-slate-200 rounded-xl text-xs bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Время</label>
-                            <input type="time" id="log-time" class="w-full p-2 border border-slate-200 rounded-xl text-xs bg-slate-50">
-                        </div>
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Дата</label><input type="date" id="log-date" class="w-full p-2 border border-slate-200 rounded-xl text-xs bg-slate-50"></div>
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Время</label><input type="time" id="log-time" class="w-full p-2 border border-slate-200 rounded-xl text-xs bg-slate-50"></div>
                     </div>
-
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">Введите продукты (через запятую):</label>
                         <div class="flex gap-2 items-center">
@@ -161,12 +159,10 @@
                             <button onclick="startVoiceInput('custom-products')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-xl transition text-sm" title="Голосовой ввод">🎤</button>
                         </div>
                     </div>
-
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-600 mb-1">💊 Принятые лекарства (через запятую):</label>
                         <input type="text" id="medications" placeholder="цетиризин 10мг, дао-форте" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                     </div>
-
                     <div class="space-y-2 border-t border-slate-100 pt-3">
                         <label class="block text-xs font-bold text-slate-600 mb-1">📝 Какие симптомы вы испытываете? (через запятую)</label>
                         <div class="flex gap-2 items-center">
@@ -175,10 +171,8 @@
                         </div>
                         <p class="text-[10px] text-slate-400 mt-1">Нажмите на микрофон и скажите текст.</p>
                     </div>
-
                     <button onclick="saveLog()" class="w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">Сохранить запись</button>
                 </div>
-
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Последние записи</h3>
@@ -188,7 +182,7 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА ПРОДУКТЫ -->
+            <!-- ВКЛАДКА ПРОДУКТЫ (поиск) -->
             <div id="products-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">🔍 Узнать уровень гистамина</h2>
@@ -200,12 +194,8 @@
                         </div>
                     </div>
                     <div class="mb-4 flex gap-2 flex-wrap">
-                        <button onclick="scanBarcode()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">
-                            📷 Сканировать камерой
-                        </button>
-                        <button onclick="uploadBarcodeImage()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">
-                            📤 Загрузить фото
-                        </button>
+                        <button onclick="scanBarcode()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">📷 Сканировать камерой</button>
+                        <button onclick="uploadBarcodeImage()" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-xl transition text-sm min-w-[120px]">📤 Загрузить фото</button>
                     </div>
                     <input type="file" id="barcode-image-input" accept="image/*" style="display:none" onchange="decodeBarcodeFromImage(this)">
                     <div id="scanner-container" style="display: none; margin-bottom: 15px;">
@@ -216,19 +206,31 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА КАЛЕНДАРЬ -->
+            <!-- НОВАЯ ВКЛАДКА: БАЗА "МОЖНО / НЕЛЬЗЯ" -->
+            <div id="safe-tab" class="tab-content space-y-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-base font-bold mb-3 text-slate-800">📋 Моя база «Можно / Нельзя»</h2>
+                    <div class="flex gap-2 mb-3 flex-wrap">
+                        <input type="text" id="safe-search-input" placeholder="Поиск продукта..." class="flex-1 p-2 border border-slate-200 rounded-xl text-sm bg-slate-50" oninput="renderSafeProducts()">
+                        <div class="flex gap-1">
+                            <button class="safe-filter-btn active" data-filter="all" onclick="setSafeFilter('all')">Все</button>
+                            <button class="safe-filter-btn" data-filter="safe" onclick="setSafeFilter('safe')">✅ Можно</button>
+                            <button class="safe-filter-btn" data-filter="unsafe" onclick="setSafeFilter('unsafe')">❌ Нельзя</button>
+                            <button class="safe-filter-btn" data-filter="question" onclick="setSafeFilter('question')">❓ Под вопросом</button>
+                        </div>
+                    </div>
+                    <div id="safe-products-list" class="space-y-1.5 max-h-96 overflow-y-auto pr-1"></div>
+                    <div class="text-xs text-slate-400 mt-3">Нажимайте на кнопки, чтобы отметить продукт.</div>
+                </div>
+            </div>
+
+            <!-- ВКЛАДКА КАЛЕНДАРЬ (для женщин) -->
             <div id="calendar-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-sm font-bold text-slate-700 mb-2">🌸 Женский календарь</h3>
                     <div class="grid grid-cols-2 gap-2 mb-4">
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Первый день последней менструации</label>
-                            <input type="date" id="last-period-start" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Длительность цикла (дней)</label>
-                            <input type="number" id="cycle-length" min="20" max="45" value="28" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
-                        </div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Первый день последней менструации</label><input type="date" id="last-period-start" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50"></div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Длительность цикла (дней)</label><input type="number" id="cycle-length" min="20" max="45" value="28" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50"></div>
                     </div>
                     <div class="mb-4">
                         <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">ПМС начинается за (дней до цикла)</label>
@@ -236,14 +238,8 @@
                         <p class="text-[9px] text-slate-400 mt-1">Например, если ПМС начинается за 10 дней до менструации — поставьте 10.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Текущий день цикла</label>
-                            <div id="cycle-day-display" class="p-2 border rounded-xl text-sm bg-slate-100 text-center font-bold">—</div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Фаза</label>
-                            <div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50 text-emerald-700 border border-emerald-100 mt-0.5">Не определена</div>
-                        </div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Текущий день цикла</label><div id="cycle-day-display" class="p-2 border rounded-xl text-sm bg-slate-100 text-center font-bold">—</div></div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Фаза</label><div id="phase-badge" class="p-2 rounded-xl text-xs font-bold text-center bg-emerald-50 text-emerald-700 border border-emerald-100 mt-0.5">Не определена</div></div>
                     </div>
                     <div class="mt-4 p-3 bg-slate-50 rounded-xl text-xs text-slate-600" id="cycle-forecast">
                         <p class="text-center">Настройте дату начала цикла для прогноза.</p>
@@ -274,13 +270,14 @@
             </div>
         </main>
 
-        <!-- НАВИГАЦИЯ (5 вкладок) -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl flex justify-around p-2 z-40">
-            <button data-tab="today" class="tab-button flex flex-col items-center p-1.5 text-emerald-600 font-bold text-[10px] gap-1 w-1/5"><span class="text-lg">📊</span><span>Сегодня</span></button>
-            <button data-tab="diary" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/5"><span class="text-lg">📝</span><span>Дневник</span></button>
-            <button data-tab="products" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/5"><span class="text-lg">🔍</span><span>Продукты</span></button>
-            <button data-tab="calendar" id="calendar-nav-btn" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/5"><span class="text-lg">🌸</span><span>Календарь</span></button>
-            <button data-tab="analytics" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-1 w-1/5"><span class="text-lg">📊</span><span>Анализ</span></button>
+        <!-- НАВИГАЦИЯ (6 вкладок) -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl flex overflow-x-auto p-2 z-40 space-x-1">
+            <button data-tab="today" class="tab-button flex flex-col items-center p-1.5 text-emerald-600 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📊</span><span>Сегодня</span></button>
+            <button data-tab="diary" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📝</span><span>Дневник</span></button>
+            <button data-tab="products" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">🔍</span><span>Продукты</span></button>
+            <button data-tab="safe" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📋</span><span>База</span></button>
+            <button data-tab="calendar" id="calendar-nav-btn" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">🌸</span><span>Календарь</span></button>
+            <button data-tab="analytics" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📊</span><span>Анализ</span></button>
         </nav>
 
         <footer class="text-center text-[10px] text-slate-400 py-4 border-t border-slate-100 mt-4 max-w-md mx-auto">
@@ -294,6 +291,7 @@
     <script>
         // ---------- БАЗА ПРОДУКТОВ (ЗАГРУЖАЕТСЯ ИЗ ВНЕШНЕГО ФАЙЛА) ----------
         let myHistamineDB = [];
+        let safeProducts = {}; // { "помидор": "safe", "сыр": "unsafe", ... } — статусы
 
         async function loadProducts() {
             try {
@@ -301,10 +299,21 @@
                 if (!response.ok) throw new Error('Не удалось загрузить базу продуктов');
                 myHistamineDB = await response.json();
                 console.log(`✅ Загружено ${myHistamineDB.length} продуктов`);
+                // Загружаем статусы из localStorage
+                const saved = localStorage.getItem('histolite_safe_products');
+                if (saved) {
+                    safeProducts = JSON.parse(saved);
+                }
+                renderSafeProducts();
             } catch (error) {
                 console.error('Ошибка загрузки продуктов:', error);
                 showModal('❌ Не удалось загрузить базу продуктов. Проверьте файл products.json.');
             }
+        }
+
+        // Сохранение статусов
+        function saveSafeProducts() {
+            localStorage.setItem('histolite_safe_products', JSON.stringify(safeProducts));
         }
 
         // ----- СПИСОК СИМПТОМОВ -----
@@ -330,8 +339,9 @@
         let savedCycleLength = localStorage.getItem('histolite_cycle_length') || 28;
         let savedPmsStartDays = localStorage.getItem('histolite_pms_start_days') || 7;
         let userGender = localStorage.getItem('histolite_gender') || 'female';
+        let safeFilter = 'all'; // all, safe, unsafe, question
 
-        // ---- ФУНКЦИИ ДЛЯ РАБОТЫ С ЦИКЛОМ ----
+        // ---- ФУНКЦИИ ДЛЯ РАБОТЫ С ЦИКЛОМ (без изменений) ----
         function getCurrentCycleDay() {
             if (!savedLastPeriodStart) return null;
             const start = new Date(savedLastPeriodStart);
@@ -349,7 +359,6 @@
             const len = savedCycleLength;
             const ovulationDay = len - 14;
             const pmsStart = len - savedPmsStartDays;
-
             if (day <= 5) return "Начало цикла";
             if (day >= 6 && day < ovulationDay) return "Фолликулярная";
             if (day >= ovulationDay && day <= ovulationDay + 1) return "Овуляция";
@@ -375,7 +384,6 @@
             const display = document.getElementById('cycle-day-display');
             const badge = document.getElementById('phase-badge');
             const forecast = document.getElementById('cycle-forecast');
-
             if (day === null || !savedLastPeriodStart) {
                 display.innerText = '—';
                 badge.innerText = 'Не определена';
@@ -383,12 +391,10 @@
                 forecast.innerHTML = '<p class="text-center text-slate-500">Укажите дату начала последней менструации в календаре.</p>';
                 return;
             }
-
             display.innerText = day;
             const phase = getCyclePhaseName(day);
             badge.innerText = phase;
             badge.className = `p-2 rounded-xl text-xs font-bold text-center border ${getPhaseColor(phase)}`;
-
             let advice = '';
             let adviceColor = 'text-slate-600';
             if (phase === "Овуляция" || phase === "ПМС") {
@@ -417,7 +423,7 @@
             updateCycleUI();
         }
 
-        // ---- ЮРИДИЧЕСКИЙ ЭКРАН И ВЫБОР ПОЛА ----
+        // ---- ЮРИДИЧЕСКИЙ ЭКРАН ----
         function toggleLegalButton() {
             var chk = document.getElementById('legal-checkbox');
             var btn = document.getElementById('legal-submit-btn');
@@ -434,7 +440,6 @@
             const genderRadio = document.querySelector('input[name="gender"]:checked');
             userGender = genderRadio ? genderRadio.value : 'female';
             localStorage.setItem('histolite_gender', userGender);
-
             localStorage.setItem('histolite_legal_accepted', 'true');
             document.getElementById('legal-modal').style.display = 'none';
             document.getElementById('app-body').classList.remove('opacity-30', 'pointer-events-none');
@@ -443,7 +448,6 @@
             updateCycleUI();
             loadProducts();
 
-            // Настройка календаря
             const dateInput = document.getElementById('last-period-start');
             const lengthInput = document.getElementById('cycle-length');
             const pmsInput = document.getElementById('pms-start-days');
@@ -453,7 +457,6 @@
             lengthInput.addEventListener('change', saveCycleSettings);
             pmsInput.addEventListener('change', saveCycleSettings);
 
-            // Скрыть календарь для мужчин
             if (userGender === 'male') {
                 document.getElementById('calendar-nav-btn').style.display = 'none';
                 if (document.getElementById('calendar-tab').classList.contains('active')) {
@@ -462,55 +465,41 @@
             } else {
                 document.getElementById('calendar-nav-btn').style.display = 'flex';
             }
-
             renderTodayDashboard();
         };
 
-        // ---- ДАШБОРД "СЕГОДНЯ" + ПРОГРЕСС И ЦЕЛИ ----
+        // ---- ДАШБОРД (без изменений) ----
         function renderTodayDashboard() {
-            // 1. Расчёт риска дня
             const cycleDay = getCurrentCycleDay();
             let riskLevel = 'Низкий';
             let riskClass = 'risk-low';
             let riskReason = 'Фаза цикла: стабильная';
             let tip = 'Сегодня хороший день, чтобы попробовать новые продукты.';
-
             if (userGender !== 'male' && cycleDay !== null) {
                 const phase = getCyclePhaseName(cycleDay);
                 if (phase === 'Овуляция' || phase === 'ПМС') {
-                    riskLevel = 'Высокий';
-                    riskClass = 'risk-high';
-                    riskReason = `Фаза цикла: ${phase} (чувствительность повышена)`;
+                    riskLevel = 'Высокий'; riskClass = 'risk-high'; riskReason = `Фаза цикла: ${phase} (чувствительность повышена)`;
                     tip = '⚠️ Сегодня повышенная чувствительность. Выбирайте зелёные продукты, избегайте сыра и шоколада.';
                 } else if (phase === 'Начало цикла' || phase === 'Лютеиновая') {
-                    riskLevel = 'Средний';
-                    riskClass = 'risk-medium';
-                    riskReason = `Фаза цикла: ${phase} (умеренная чувствительность)`;
+                    riskLevel = 'Средний'; riskClass = 'risk-medium'; riskReason = `Фаза цикла: ${phase} (умеренная чувствительность)`;
                     tip = '🟡 Умеренная чувствительность. Следите за реакциями, но можно пробовать новое.';
                 } else {
-                    riskLevel = 'Низкий';
-                    riskClass = 'risk-low';
-                    riskReason = `Фаза цикла: ${phase} (стабильная)`;
+                    riskLevel = 'Низкий'; riskClass = 'risk-low'; riskReason = `Фаза цикла: ${phase} (стабильная)`;
                     tip = '✅ Организм стабилен. Можно пробовать новые продукты и экспериментировать.';
                 }
             } else if (userGender === 'male') {
-                riskLevel = 'Низкий';
-                riskClass = 'risk-low';
-                riskReason = 'Мужчина, цикл не учитывается';
+                riskLevel = 'Низкий'; riskClass = 'risk-low'; riskReason = 'Мужчина, цикл не учитывается';
                 tip = '✅ Отслеживайте питание и симптомы, чтобы находить свои триггеры.';
             } else {
                 riskReason = 'Цикл не настроен';
                 tip = 'Настройте календарь цикла для более точных прогнозов.';
             }
-
-            // Обновляем карточку риска
             const riskCard = document.getElementById('risk-card');
             riskCard.className = `risk-card ${riskClass}`;
             document.getElementById('risk-level').textContent = riskLevel;
             document.getElementById('risk-reason').textContent = riskReason;
             document.getElementById('today-tip').textContent = tip;
 
-            // 2. Статистика: записи за 7 дней
             const now = new Date();
             const sevenDaysAgo = new Date(now);
             sevenDaysAgo.setDate(now.getDate() - 7);
@@ -520,7 +509,6 @@
             });
             document.getElementById('week-logs').textContent = weekLogs.length;
 
-            // 3. Streak
             let streak = 0;
             if (userLogs.length > 0) {
                 const dates = userLogs.map(log => log.date).sort();
@@ -546,17 +534,13 @@
             }
             document.getElementById('streak').textContent = streak;
 
-            // 4. Триггеры
             const lastTriggers = JSON.parse(localStorage.getItem('histolite_last_triggers')) || [];
             document.getElementById('triggers-count').textContent = lastTriggers.length;
 
-            // 5. ПРОГРЕСС И ЦЕЛИ
             const weekGoal = 5;
             const weekLogsCount = weekLogs.length;
             const progressPercent = Math.min(100, Math.round((weekLogsCount / weekGoal) * 100));
             let goalMessage = (weekLogsCount >= weekGoal) ? '🎉 Цель недели выполнена!' : `📝 Осталось ${weekGoal - weekLogsCount} записей до цели`;
-
-            // Бейджи
             const badges = [];
             if (userLogs.length >= 1) badges.push('🎉 Первая запись');
             if (streak >= 7) badges.push('🔥 7 дней подряд');
@@ -577,9 +561,7 @@
                     ${badges.length > 0 ? `<div class="flex flex-wrap gap-1 mt-2">${badges.map(b => `<span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">${b}</span>`).join('')}</div>` : '<div class="text-xs text-slate-400 mt-1">Продолжайте вести дневник, чтобы открывать достижения! 🌟</div>'}
                 </div>
             `;
-
-            const progressContainer = document.getElementById('progress-container');
-            progressContainer.innerHTML = progressHtml;
+            document.getElementById('progress-container').innerHTML = progressHtml;
         }
 
         // ---- СОХРАНЕНИЕ ЗАПИСИ ----
@@ -587,7 +569,6 @@
             const date = document.getElementById('log-date').value;
             const time = document.getElementById('log-time').value;
             if (!date) { showModal('Укажите дату'); return; }
-
             if (userGender !== 'male') {
                 const cycleDay = getCurrentCycleDay();
                 if (cycleDay === null || !savedLastPeriodStart) {
@@ -595,30 +576,25 @@
                     return;
                 }
             }
-
             const customRaw = document.getElementById('custom-products').value;
             let allProducts = customRaw.trim() ? customRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
             const medsRaw = document.getElementById('medications').value;
             let medications = medsRaw.trim() ? medsRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
             if (allProducts.length === 0 && medications.length === 0) { showModal('Выберите/введите продукты или лекарства'); return; }
             const symptomsText = document.getElementById('symptoms-text-input').value.trim();
-
             const cycleDay = (userGender === 'male') ? 0 : getCurrentCycleDay();
-
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
             userLogs.push({ date, time, cycleDay, products: allProducts, medications, symptomsText });
             localStorage.setItem('histolite_logs', JSON.stringify(userLogs));
-
             document.getElementById('custom-products').value = '';
             document.getElementById('medications').value = '';
             document.getElementById('symptoms-text-input').value = '';
-
             renderHistory();
             renderTodayDashboard();
             showModal('Запись сохранена');
         };
 
-        // ---- ИСТОРИЯ ----
+        // ---- ИСТОРИЯ (без изменений) ----
         window.renderHistory = function() {
             const container = document.getElementById('history-container');
             if (!userLogs.length) { container.innerHTML = '<div class="text-center text-slate-400 p-4">Нет записей</div>'; return; }
@@ -677,13 +653,11 @@
             const resultDiv = document.getElementById('product-search-result');
             resultDiv.classList.remove('hidden', 'low', 'medium', 'high', 'unknown');
             resultDiv.innerHTML = '';
-
             if (myHistamineDB.length === 0) {
                 resultDiv.className = 'product-result unknown text-sm';
                 resultDiv.innerHTML = `<strong>⏳ База продуктов загружается...</strong><br>Пожалуйста, подождите.`;
                 return;
             }
-
             const foundItems = myHistamineDB.filter(item =>
                 item.name.includes(query) || query.includes(item.name)
             );
@@ -691,25 +665,85 @@
                 const found = foundItems[0];
                 let levelClass = '';
                 let statusText = '';
-                if (found.level === 'низкий') {
-                    levelClass = 'low';
-                    statusText = '🟢 Низкий гистамин — продукт безопасен.';
-                } else if (found.level === 'средний') {
-                    levelClass = 'medium';
-                    statusText = '🟡 Средний гистамин — употребляйте с осторожностью.';
-                } else if (found.level === 'высокий') {
-                    levelClass = 'high';
-                    statusText = '🔴 Высокий гистамин — рекомендуется избегать.';
-                }
+                if (found.level === 'низкий') { levelClass = 'low'; statusText = '🟢 Низкий гистамин — продукт безопасен.'; }
+                else if (found.level === 'средний') { levelClass = 'medium'; statusText = '🟡 Средний гистамин — употребляйте с осторожностью.'; }
+                else if (found.level === 'высокий') { levelClass = 'high'; statusText = '🔴 Высокий гистамин — рекомендуется избегать.'; }
+                // Добавляем личный статус, если есть
+                const safeStatus = safeProducts[found.name];
+                let personalNote = '';
+                if (safeStatus === 'safe') personalNote = ' ✅ Ваш безопасный';
+                else if (safeStatus === 'unsafe') personalNote = ' ❌ Ваш нежелательный';
+                else if (safeStatus === 'question') personalNote = ' ❓ Под вопросом';
                 resultDiv.className = `product-result ${levelClass} text-sm`;
-                resultDiv.innerHTML = `<strong>${found.name.charAt(0).toUpperCase() + found.name.slice(1)}</strong><br>${statusText}`;
+                resultDiv.innerHTML = `<strong>${found.name.charAt(0).toUpperCase() + found.name.slice(1)}</strong><br>${statusText}${personalNote}`;
             } else {
                 resultDiv.className = 'product-result unknown text-sm';
                 resultDiv.innerHTML = `<strong>${query}</strong><br>🟡 Статус не определён. Проверьте состав вручную или используйте сканер штрих-кода.`;
             }
         };
 
-        // ---- СКАНЕР (оставлен без изменений) ----
+        // ---- БАЗА "МОЖНО / НЕЛЬЗЯ" ----
+        function renderSafeProducts() {
+            const container = document.getElementById('safe-products-list');
+            if (!container) return;
+            const search = document.getElementById('safe-search-input')?.value.toLowerCase() || '';
+            const filtered = myHistamineDB.filter(p => p.name.includes(search));
+            let displayList = filtered;
+            if (safeFilter === 'safe') {
+                displayList = filtered.filter(p => safeProducts[p.name] === 'safe');
+            } else if (safeFilter === 'unsafe') {
+                displayList = filtered.filter(p => safeProducts[p.name] === 'unsafe');
+            } else if (safeFilter === 'question') {
+                displayList = filtered.filter(p => safeProducts[p.name] === 'question');
+            }
+
+            if (displayList.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 p-4">Ничего не найдено</div>';
+                return;
+            }
+            container.innerHTML = displayList.map(p => {
+                const status = safeProducts[p.name] || 'none';
+                const statusClass = status === 'safe' ? 'active-safe' : (status === 'unsafe' ? 'active-unsafe' : (status === 'question' ? 'active-question' : ''));
+                return `
+                    <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-100">
+                        <span class="text-sm font-medium">${p.name}</span>
+                        <div class="flex gap-1">
+                            <button class="product-status-btn ${status === 'safe' ? 'active-safe' : ''}" onclick="setProductStatus('${p.name}', 'safe')" title="Можно">✅</button>
+                            <button class="product-status-btn ${status === 'question' ? 'active-question' : ''}" onclick="setProductStatus('${p.name}', 'question')" title="Под вопросом">❓</button>
+                            <button class="product-status-btn ${status === 'unsafe' ? 'active-unsafe' : ''}" onclick="setProductStatus('${p.name}', 'unsafe')" title="Нельзя">❌</button>
+                            ${status !== 'none' ? `<button class="product-status-btn" onclick="setProductStatus('${p.name}', 'none')" title="Сбросить">↺</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.setProductStatus = function(name, status) {
+            if (status === 'none') {
+                delete safeProducts[name];
+            } else {
+                safeProducts[name] = status;
+            }
+            saveSafeProducts();
+            renderSafeProducts();
+            // Можно обновить поиск, если он открыт
+        };
+
+        window.setSafeFilter = function(filter) {
+            safeFilter = filter;
+            document.querySelectorAll('.safe-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'unsafe-active', 'question-active');
+                if (btn.dataset.filter === filter) {
+                    if (filter === 'safe') btn.classList.add('active');
+                    else if (filter === 'unsafe') btn.classList.add('unsafe-active');
+                    else if (filter === 'question') btn.classList.add('question-active');
+                    else btn.classList.add('active');
+                }
+            });
+            renderSafeProducts();
+        };
+
+        // ---- СКАНЕР (без изменений) ----
         let html5QrCodeSearch = null;
         window.scanBarcodeForSearch = function() {
             const container = document.getElementById('scanner-search-container');
@@ -748,8 +782,13 @@
                             if (found.level === 'низкий') { levelClass = 'low'; statusText = '🟢 Низкий гистамин — безопасен.'; }
                             else if (found.level === 'средний') { levelClass = 'medium'; statusText = '🟡 Средний гистамин — с осторожностью.'; }
                             else if (found.level === 'высокий') { levelClass = 'high'; statusText = '🔴 Высокий гистамин — избегать.'; }
+                            const safeStatus = safeProducts[found.name];
+                            let personalNote = '';
+                            if (safeStatus === 'safe') personalNote = ' ✅ Ваш безопасный';
+                            else if (safeStatus === 'unsafe') personalNote = ' ❌ Ваш нежелательный';
+                            else if (safeStatus === 'question') personalNote = ' ❓ Под вопросом';
                             resultDiv.className = `product-result ${levelClass} text-sm`;
-                            resultDiv.innerHTML = `<strong>${productName}</strong><br>${statusText}`;
+                            resultDiv.innerHTML = `<strong>${productName}</strong><br>${statusText}${personalNote}`;
                         } else {
                             resultDiv.className = 'product-result unknown text-sm';
                             resultDiv.innerHTML = `<strong>${productName}</strong><br>🟡 Статус не определён. Проверьте состав вручную.`;
@@ -933,6 +972,7 @@
             if(tabId === 'analytics') { renderCycleSymptomAnalysis(); renderCycleLoadCalendar(); }
             if(tabId === 'calendar') { updateCycleUI(); }
             if(tabId === 'today') { renderTodayDashboard(); }
+            if(tabId === 'safe') { renderSafeProducts(); }
         }
         document.querySelectorAll('.tab-button').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.getAttribute('data-tab'))));
 
@@ -961,6 +1001,8 @@
                     document.getElementById('calendar-nav-btn').style.display = 'flex';
                 }
                 renderTodayDashboard();
+                // Инициализация фильтра "Все"
+                setSafeFilter('all');
             } else {
                 document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
                 document.getElementById('log-time').value = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
