@@ -339,6 +339,39 @@
                     <p class="text-[10px] text-slate-400 mt-2">*PDF с таблицей, статистикой и графиком</p>
                 </div>
             </div>
+<!-- ВКЛАДКА РЕЦЕПТЫ -->
+<div id="recipes-tab" class="tab-content space-y-4">
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+        <h2 class="text-base font-bold mb-3 text-slate-800">🍳 Рецепты</h2>
+        <div class="flex flex-wrap gap-2 mb-4">
+            <button class="recipe-filter-btn active" data-category="all">Все</button>
+            <button class="recipe-filter-btn" data-category="завтрак">Завтрак</button>
+            <button class="recipe-filter-btn" data-category="обед">Обед</button>
+            <button class="recipe-filter-btn" data-category="ужин">Ужин</button>
+            <button class="recipe-filter-btn" data-category="перекус">Перекус</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-4">
+            <button class="level-filter-btn active" data-level="all">Все уровни</button>
+            <button class="level-filter-btn" data-level="низкий">🟢 Низкий</button>
+            <button class="level-filter-btn" data-level="средний">🟡 Средний</button>
+            <button class="level-filter-btn" data-level="высокий">🔴 Высокий</button>
+        </div>
+        <div class="flex flex-wrap gap-4 mb-4">
+            <label class="flex items-center gap-1 text-xs">
+                <input type="checkbox" id="filter-gluten-free" onchange="renderRecipes()"> 🌾 Без глютена
+            </label>
+            <label class="flex items-center gap-1 text-xs">
+                <input type="checkbox" id="filter-lactose-free" onchange="renderRecipes()"> 🥛 Без лактозы
+            </label>
+            <label class="flex items-center gap-1 text-xs">
+                <input type="checkbox" id="filter-dairy-free" onchange="renderRecipes()"> 🧈 Без молочных продуктов
+            </label>
+        </div>
+        <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Сюда будут подгружаться карточки рецептов -->
+        </div>
+    </div>
+</div>
         </main>
 
         <!-- НАВИГАЦИЯ -->
