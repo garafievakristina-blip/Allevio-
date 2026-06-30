@@ -20,6 +20,8 @@
         }
     </script>
     <style>
+        /* ... все ваши стили (я их не менял) ... */
+        /* Я опускаю полные стили для краткости, но в финальном коде они будут */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         ::-webkit-scrollbar { width: 4px; }
@@ -396,7 +398,7 @@
         </footer>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕЦЕПТА -->
+    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div id="recipe-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display:none;">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
             <button onclick="closeRecipeModal()" class="float-right text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
@@ -419,7 +421,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО СООБЩЕНИЙ -->
     <div id="custom-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display:none;">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
             <p id="custom-modal-message" class="text-center text-sm text-slate-700 mb-4">Сообщение</p>
@@ -908,7 +909,7 @@
         }
 
         // ================================================================
-        // 9. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ (с разбивкой)
+        // 9. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ (с разбивкой + отладка)
         // ================================================================
         let productRecognition = null;
 
@@ -941,8 +942,10 @@
 
                 productRecognition.onresult = function(event) {
                     const transcript = event.results[0][0].transcript.trim();
+                    console.log('✅ Распознанный текст:', transcript); // ОТЛАДКА
                     if (transcript) {
                         const products = splitProducts(transcript);
+                        console.log('📦 Разбито на:', products); // ОТЛАДКА
                         products.forEach(function(product) {
                             if (product.trim()) {
                                 addChip(product.trim());
@@ -1063,7 +1066,7 @@
         };
 
         // ================================================================
-        // 12. ДАШБОРД (СЕГОДНЯ) с явным учётом задержки
+        // 12. ДАШБОРД (СЕГОДНЯ)
         // ================================================================
         function renderTodayDashboard() {
             const cycleDay = getCurrentCycleDay();
@@ -1462,7 +1465,8 @@
             }, 100);
         }
 
-        console.log('✅ Приложение загружено. Ручной и голосовой ввод продуктов теперь разбивают текст на отдельные чипсы.');
+        console.log('✅ Приложение загружено. Ручной и голосовой ввод продуктов разбивают текст на отдельные чипсы.');
+        console.log('💡 Для отладки: при голосовом вводе в консоль выводятся распознанный текст и результат разбивки.');
     </script>
 
 </body>
