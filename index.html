@@ -814,36 +814,84 @@
         };
 
         // ================================================================
-        // 8. ГОЛОСОВОЙ ВВОД (с индикацией)
-        // ================================================================
-        let recognition = null;
-        window.startVoiceInput = function(inputId) {
-            const micBtn = document.getElementById('mic-button');
+       // ================================================================
+// 8. ГОЛОСОВОЙ ВВОД ДЛЯ СИМПТОМОВ (с индикацией)
+// ================================================================
+let recognition = null;
+window.startVoiceInput = function(inputId) {
+    const micBtn = document.getElementById('mic-button');
+    if (recognition) {
+        recognition.stop();
+        recognition = null;
+        micBtn.classList.remove('mic-active');
+        micBtn.textContent = '🎤';
+        return;
+    }
+    try {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'ru-RU';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        micBtn.classList.add('mic-active');
+        micBtn.textContent = '⏺';
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            const input = document.getElementById(inputId);
+            input.value += (input.value ? ', ' : '') + transcript;
+            recognition.stop();
+            recognition = null;
+            micBtn.classList.remove('mic-active');
+            micBtn.textContent = '🎤';
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Ошибка распознавания:', event.error);
+            micBtn.classList.remove('mic-active');
+            micBtn.textContent = '🎤';
+            if (event.error === 'not-allowed') {
+                showModal('⚠️ Доступ к микрофону запрещён. Разрешите доступ в настройках браузера.');
+            } else {
+                showModal('Ошибка распознавания: ' + event.error);
+            }
+            recognition = null;
+        };
+
+        recognition.onend = function() {
             if (recognition) {
-                // Если уже идёт запись, остановить
-                recognition.stop();
                 recognition = null;
                 micBtn.classList.remove('mic-active');
                 micBtn.textContent = '🎤';
-                return;
             }
-            // Голосовой ввод для продуктов (добавляет продукт сразу в чипсы)
+        };
+
+        recognition.start();
+    } catch (e) {
+        console.error('Ошибка запуска распознавания:', e);
+        showModal('Ваш браузер не поддерживает голосовой ввод. Используйте печать.');
+        micBtn.classList.remove('mic-active');
+        micBtn.textContent = '🎤';
+    }
+};
+
+// ================================================================
+// 8.1. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ (глобально, с разбивкой)
+// ================================================================
 let productRecognition = null;
+
 // Разбивает голосовой текст на отдельные продукты
 function splitProducts(text) {
-    // Убираем лишние пробелы
     text = text.replace(/\s+/g, ' ').trim();
-    // Заменяем союз "и" и "или" на запятую
     text = text.replace(/\s+и\s+/g, ', ');
     text = text.replace(/\s+или\s+/g, ', ');
-    // Разбиваем по запятым, точкам, пробелам (если нет запятых)
     let parts = text.split(/[,.]\s*/).filter(p => p.trim() !== '');
-    // Если запятых нет, разбиваем по пробелам
     if (parts.length === 0) {
         parts = text.split(/\s+/).filter(p => p.trim() !== '');
     }
     return parts;
 }
+
 window.startVoiceInputForProducts = function() {
     const micBtn = document.getElementById('mic-products-btn');
     if (productRecognition) {
@@ -863,21 +911,20 @@ window.startVoiceInputForProducts = function() {
         micBtn.textContent = '⏺';
 
         productRecognition.onresult = function(event) {
-    const transcript = event.results[0][0].transcript.trim();
-    if (transcript) {
-        // Разбиваем текст на отдельные продукты
-        const products = splitProducts(transcript);
-        products.forEach(function(product) {
-            if (product.trim()) {
-                addChip(product.trim());
+            const transcript = event.results[0][0].transcript.trim();
+            if (transcript) {
+                const products = splitProducts(transcript);
+                products.forEach(function(product) {
+                    if (product.trim()) {
+                        addChip(product.trim());
+                    }
+                });
             }
-        });
-    }
-    productRecognition.stop();
-    productRecognition = null;
-    micBtn.classList.remove('mic-active');
-    micBtn.textContent = '🎤';
-};
+            productRecognition.stop();
+            productRecognition = null;
+            micBtn.classList.remove('mic-active');
+            micBtn.textContent = '🎤';
+        };
 
         productRecognition.onerror = function(event) {
             console.error('Ошибка распознавания:', event.error);
@@ -907,56 +954,6 @@ window.startVoiceInputForProducts = function() {
         micBtn.textContent = '🎤';
     }
 };
-            try {
-                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                recognition.lang = 'ru-RU';
-                recognition.interimResults = false;
-                recognition.maxAlternatives = 1;
-
-                // Визуальная индикация
-                micBtn.classList.add('mic-active');
-                micBtn.textContent = '⏺';
-
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    const input = document.getElementById(inputId);
-                    input.value += (input.value ? ', ' : '') + transcript;
-                    // Останавливаем распознавание после успеха
-                    recognition.stop();
-                    recognition = null;
-                    micBtn.classList.remove('mic-active');
-                    micBtn.textContent = '🎤';
-                };
-
-                recognition.onerror = function(event) {
-                    console.error('Ошибка распознавания:', event.error);
-                    micBtn.classList.remove('mic-active');
-                    micBtn.textContent = '🎤';
-                    if (event.error === 'not-allowed') {
-                        showModal('⚠️ Доступ к микрофону запрещён. Разрешите доступ в настройках браузера.');
-                    } else {
-                        showModal('Ошибка распознавания: ' + event.error);
-                    }
-                    recognition = null;
-                };
-
-                recognition.onend = function() {
-                    // Если распознавание завершилось без результата (например, тишина)
-                    if (recognition) {
-                        recognition = null;
-                        micBtn.classList.remove('mic-active');
-                        micBtn.textContent = '🎤';
-                    }
-                };
-
-                recognition.start();
-            } catch (e) {
-                console.error('Ошибка запуска распознавания:', e);
-                showModal('Ваш браузер не поддерживает голосовой ввод. Используйте печать.');
-                micBtn.classList.remove('mic-active');
-                micBtn.textContent = '🎤';
-            }
-        };
 
         // ================================================================
         // 9. СОХРАНЕНИЕ ЗАПИСИ
