@@ -1554,25 +1554,7 @@
                     });
                 }
                 if (pmsInput) {
-                    pmsInput.value = savedPmsStartDays;
-                    pmsInput.addEventListener('change', function() {
-                        const val = parseInt(this.value) || 7;
-                        savedPmsStartDays = val;
-                        localStorage.setItem('histolite_pms_start_days', val);
-                        renderCycleCalendar();
-                        renderTodayDashboard();
-                    });
-                }
-                if (userGender === 'male') {
-                    document.getElementById('calendar-nav-btn').style.display = 'none';
-                } else {
-                    document.getElementById('calendar-nav-btn').style.display = 'flex';
-                }
-                renderTodayDashboard();
-                checkNotifications();
-                loadRecipes();
-                renderCycleCalendar();
-            }, 100);
+                   
         }
 
         console.log('✅ Приложение загружено. Календарь использует корректную логику: ожидаемый день начала = первый день + (длительность цикла - 1)');
