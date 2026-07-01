@@ -371,6 +371,24 @@
             </div>
         </div>
     </div>
+    <div id="cycle-day-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+        <h4 class="text-base font-bold text-slate-800 mb-2">День цикла</h4>
+        <p class="text-sm text-slate-600 mb-3" id="cycle-day-modal-date">Дата:</p>
+        <p class="text-sm text-slate-600 mb-3" id="cycle-day-modal-info">День цикла:</p>
+
+        <label class="block text-xs font-bold text-slate-600 mb-1">Симптомы за этот день</label>
+        <textarea id="cycle-day-symptoms" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-slate-50 min-h-[120px]" placeholder="Например: головная боль, вздутие, зуд"></textarea>
+
+        <label class="block text-xs font-bold text-slate-600 mb-1 mt-3">Комментарий</label>
+        <textarea id="cycle-day-comment" class="w-full p-3 border border-slate-200 rounded-xl text-sm bg-slate-50 min-h-[80px]" placeholder="Например: хуже перед сном"></textarea>
+
+        <div class="flex gap-2 mt-4">
+            <button onclick="saveCycleDay()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl text-sm">Сохранить</button>
+            <button onclick="closeCycleDayModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-xl text-sm">Отмена</button>
+        </div>
+    </div>
+</div>
 
     <div id="recipe-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display:none;">
         <!-- ... -->
@@ -399,6 +417,10 @@
         let cycleMarks = JSON.parse(localStorage.getItem('histolite_cycle_marks')) || {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+        let cycleDayNotes = JSON.parse(localStorage.getItem('histolite_cycle_day_notes')) || {};
+let selectedCycleDayDate = null;
+        let cycleDayNotes = JSON.parse(localStorage.getItem('histolite_cycle_day_notes')) || {};
+let selectedCycleDayDate = null;
 
         const symptomsList = [
             { id: "brain_fog", name: "🌫️ Туман в голове" },
@@ -971,40 +993,81 @@
             document.getElementById('event-modal').style.display = 'none';
             selectedDate = null;
         }
+        function openCycleDay(year, month, day) {
+    const dateStr = formatDate(year, month, day);
+    const dateObj = new Date(year, month, day);
+    const cycleDay = savedLastPeriodStart
+        ? Math.floor((new Date(dateStr) - new Date(savedLastPeriodStart)) / (1000 * 60 * 60 * 24)) + 1
+        : null;
+
+    selectedCycleDayDate = dateStr;
+    document.getElementById('cycle-day-modal-date').textContent = `Дата: ${dateObj.toLocaleDateString('ru-RU')}`;
+    document.getElementById('cycle-day-modal-info').textContent = cycleDay ? `День цикла: ${cycleDay}` : 'Цикл не настроен';
+
+    const saved = cycleDayNotes[dateStr] || { symptoms: '', comment: '' };
+    document.getElementById('cycle-day-symptoms').value = saved.symptoms || '';
+    document.getElementById('cycle-day-comment').value = saved.comment || '';
+
+    document.getElementById('cycle-day-modal').style.display = 'flex';
+}
+
+function closeCycleDayModal() {
+    document.getElementById('cycle-day-modal').style.display = 'none';
+    selectedCycleDayDate = null;
+}
+
+window.saveCycleDay = function() {
+    if (!selectedCycleDayDate) return;
+
+    cycleDayNotes[selectedCycleDayDate] = {
+        symptoms: document.getElementById('cycle-day-symptoms').value.trim(),
+        comment: document.getElementById('cycle-day-comment').value.trim()
+    };
+
+    localStorage.setItem('histolite_cycle_day_notes', JSON.stringify(cycleDayNotes));
+    closeCycleDayModal();
+    showModal('Данные дня сохранены');
+};
 
         window.confirmEvent = function(type) {
-            if (!selectedDate) {
-                showModal('Ошибка: дата не выбрана');
-                return;
-            }
+    if (!selectedDate) {
+        showModal('Ошибка: дата не выбрана');
+        return;
+    }
 
-            if (type === 'clear') {
-                delete cycleMarks[selectedDate];
-                if (selectedDate === savedLastPeriodStart) {
-                    savedLastPeriodStart = '';
-                    localStorage.setItem('histolite_last_period_start', '');
-                }
-                showModal('Отметка снята');
-            } else {
-                if (type === 'first_day') {
-                    for (let key in cycleMarks) {
-                        if (cycleMarks[key] === 'first_day') {
-                            delete cycleMarks[key];
-                        }
-                    }
-                    savedLastPeriodStart = selectedDate;
-                    localStorage.setItem('histolite_last_period_start', savedLastPeriodStart);
-                }
-                cycleMarks[selectedDate] = type;
-                let label = type === 'first_day' ? 'Первый день цикла' : type === 'ovulation' ? 'Овуляция' : 'Последний день менструации';
-                showModal(`Отмечено: ${label}`);
-            }
+    if (type === 'clear') {
+        delete cycleMarks[selectedDate];
 
-            localStorage.setItem('histolite_cycle_marks', JSON.stringify(cycleMarks));
-            closeEventModal();
-            renderCycleCalendar();
-            renderTodayDashboard();
-        };
+        if (selectedDate === savedLastPeriodStart) {
+            savedLastPeriodStart = '';
+            localStorage.setItem('histolite_last_period_start', '');
+        }
+
+        localStorage.setItem('histolite_cycle_marks', JSON.stringify(cycleMarks));
+        closeEventModal();
+        renderCycleCalendar();
+        renderTodayDashboard();
+        showModal('Отметка снята');
+        return;
+    }
+
+    if (type === 'first_day') {
+        for (let key in cycleMarks) {
+            if (cycleMarks[key] === 'first_day') delete cycleMarks[key];
+        }
+        savedLastPeriodStart = selectedDate;
+        localStorage.setItem('histolite_last_period_start', savedLastPeriodStart);
+    }
+
+    cycleMarks[selectedDate] = type;
+    localStorage.setItem('histolite_cycle_marks', JSON.stringify(cycleMarks));
+
+    const label = type === 'first_day' ? 'Первый день цикла' : type === 'ovulation' ? 'Овуляция' : 'Последний день менструации';
+    closeEventModal();
+    renderCycleCalendar();
+    renderTodayDashboard();
+    showModal(`Отмечено: ${label}`);
+};
 
         window.changeMonth = function(delta) {
             currentMonth += delta;
@@ -1040,15 +1103,14 @@
             // предшествующего первому дню следующего цикла.
             // Поэтому следующий первый день = дата_начала + (длительность_цикла - 1) дней.
             // Например: 2 июня + 24 дня = 26 июня (при цикле 25 дней).
-            if (savedLastPeriodStart) {
-                const start = new Date(savedLastPeriodStart);
-                expectedStartDate = new Date(start);
-                // Вычитаем 1, потому что первый день уже входит в длительность цикла
-                expectedStartDate.setDate(start.getDate() + parseInt(savedCycleLength) - 1);
-            } else {
-                expectedStartDate = null;
-            }
-
+            // Вычисляем дату ожидаемого начала следующего цикла
+if (savedLastPeriodStart) {
+    const start = new Date(savedLastPeriodStart);
+    expectedStartDate = new Date(start);
+    expectedStartDate.setDate(start.getDate() + parseInt(savedCycleLength) - 1);
+} else {
+    expectedStartDate = null;
+}
             const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
             document.getElementById('calendar-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
@@ -1138,7 +1200,7 @@
                     extraClasses += ' today';
                 }
 
-                html += `<div class="cycle-day-cell ${bg} ${text} ${extraClasses}" data-year="${currentYear}" data-month="${currentMonth}" data-day="${d}" onclick="openEventModal(${currentYear}, ${currentMonth}, ${d})">${label}</div>`;
+                html += `<div class="cycle-day-cell ${bg} ${text} ${extraClasses}" data-year="${currentYear}" data-month="${currentMonth}" data-day="${d}" onclick="openEventModal(${currentYear}, ${currentMonth}, ${d})" ondblclick="openCycleDay(${currentYear}, ${currentMonth}, ${d})">${label}</div>`;
             }
 
             html += '</div>';
