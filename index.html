@@ -390,6 +390,7 @@
                     </div>
                 </div>
                 <button onclick="clearAllMarks()" class="w-full mt-3 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl text-sm transition">🗑️ Очистить все отметки цикла</button>
+            <button onclick="fullReset()" class="w-full mt-2 bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition">🔄 Полный сброс данных (очистить всё)</button>
             </div>
 
             <!-- ВКЛАДКА АНАЛИТИКА -->
@@ -1743,6 +1744,25 @@
         renderCycleCalendar();
         renderTodayDashboard();
         showModal('Все отметки удалены. Теперь отметьте первый день цикла заново.');
+    }
+};
+        window.fullReset = function() {
+    if (confirm('Это удалит ВСЕ данные: записи, продукты, настройки цикла, отметки. Продолжить?')) {
+        const keys = [
+            'histolite_logs',
+            'histolite_safe_products',
+            'histolite_gender',
+            'histolite_last_period_start',
+            'histolite_cycle_length',
+            'histolite_pms_start_days',
+            'histolite_cycle_marks',
+            'histolite_cycle_day_notes',
+            'histolite_user_recipes',
+            'histolite_last_visit',
+            'histolite_legal_accepted'
+        ];
+        keys.forEach(key => localStorage.removeItem(key));
+        location.reload(); // перезагрузка страницы
     }
 };
         console.log('✅ Приложение загружено. Календарь использует корректную логику: ожидаемый день начала = первый день + (длительность цикла - 1)');
