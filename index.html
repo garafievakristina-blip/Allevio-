@@ -132,63 +132,65 @@
         .mic-active { background-color: #3b82f6 !important; transform: scale(1.1); box-shadow: 0 0 10px #3b82f6; }
         .mic-error { background-color: #ef4444 !important; }
 
-        .cycle-day-cell {
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: all 0.1s;
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
-        .cycle-day-cell:hover {
-            opacity: 0.8;
-            transform: scale(0.95);
-        }
-        .cycle-day-cell.today {
-            border: 2px solid #2563eb;
-            box-shadow: 0 0 4px #2563eb;
-        }
-        .cycle-day-cell.ovulation {
-            border: 2px solid #d97706;
-            box-shadow: 0 0 4px #d97706;
-        }
-        .cycle-day-cell.delay {
-            background-color: #e5e7eb;
-            color: #6b7280;
-            font-style: italic;
-        }
-        .cycle-day-cell.first-day {
-            border: 3px solid #dc2626;
-            box-shadow: 0 0 6px #dc2626;
-        }
-        .cycle-day-cell.last-day {
-            border: 3px solid #8b5cf6;
-            box-shadow: 0 0 6px #8b5cf6;
-        }
-        .cycle-day-cell.has-mark::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-        .cycle-day-cell.has-mark.first-day::after {
-            background: #dc2626;
-        }
-        .cycle-day-cell.has-mark.ovulation::after {
-            background: #d97706;
-        }
-        .cycle-day-cell.has-mark.last-day::after {
-            background: #8b5cf6;
-        }
+       /* ===== ПАСТЕЛЬНЫЕ ЦВЕТА ДЛЯ КАЛЕНДАРЯ ===== */
+.cycle-day-cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.1s;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+.cycle-day-cell:hover {
+    opacity: 0.8;
+    transform: scale(0.95);
+}
+/* Сегодня – нежно-голубой */
+.cycle-day-cell.today {
+    background-color: #D6EAF8 !important;
+    border: 2px solid #2980B9;
+    box-shadow: 0 0 4px #2980B9;
+}
+/* Овуляция – пастельно-жёлтый */
+.cycle-day-cell.ovulation {
+    background-color: #FCF3CF !important;
+    border: 2px solid #F39C12;
+    box-shadow: 0 0 4px #F39C12;
+}
+/* Первый день цикла – пастельно-розовый */
+.cycle-day-cell.first-day {
+    background-color: #FADBD8 !important;
+    border: 3px solid #E74C3C;
+    box-shadow: 0 0 6px #E74C3C;
+}
+/* Последний день менструации – пастельно-фиолетовый */
+.cycle-day-cell.last-day {
+    background-color: #E8DAEF !important;
+    border: 3px solid #8E44AD;
+    box-shadow: 0 0 6px #8E44AD;
+}
+/* Задержка – светло-серый */
+.cycle-day-cell.delay {
+    background-color: #EAECEE !important;
+    color: #7F8C8D;
+    font-style: italic;
+}
+/* Ожидаемый день начала следующего цикла – пастельно-зелёный с пунктирной рамкой */
+.cycle-day-cell.expected {
+    background-color: #D5F5E3 !important;
+    border: 2px dashed #27AE60;
+}
+/* Фазы цикла (используются для фона, когда нет явных отметок) */
+.phase-start { background-color: #FADBD8 !important; }
+.phase-follicular { background-color: #D5F5E3 !important; }
+.phase-ovulation { background-color: #FCF3CF !important; }
+.phase-luteal { background-color: #D5F5E3 !important; }
+.phase-pms { background-color: #FADBD8 !important; } 
         .calendar-nav-btn {
             padding: 4px 10px;
             border-radius: 9999px;
@@ -306,11 +308,12 @@
                         💡 Кликните по дате, чтобы отметить: первый день цикла, овуляцию или последний день менструации.
                     </div>
                     <!-- Навигация по месяцам -->
-                    <div class="flex items-center justify-between mb-3">
-                        <button class="calendar-nav-btn" onclick="changeMonth(-1)">◀</button>
-                        <span class="calendar-month-label" id="calendar-month-label">Январь 2025</span>
-                        <button class="calendar-nav-btn" onclick="changeMonth(1)">▶</button>
-                    </div>
+                   <div class="flex items-center justify-between mb-3">
+    <button class="calendar-nav-btn" onclick="changeMonth(-1)">◀</button>
+    <span class="calendar-month-label" id="calendar-month-label">Январь 2025</span>
+    <button class="calendar-nav-btn" onclick="changeMonth(1)">▶</button>
+</div>
+                    <button class="calendar-nav-btn" onclick="goToToday()">Сегодня</button>
                     <!-- Сетка календаря -->
                     <div id="cycle-load-calendar" class="cycle-calendar"></div>
                     <!-- Легенда -->
@@ -398,7 +401,7 @@
         let myHistamineDB = [];
         let recipesDB = [];
         let userRecipes = JSON.parse(localStorage.getItem('histolite_user_recipes')) || [];
-
+let expectedStartDate = null; // будет хранить дату ожидаемого начала следующего цикла
         let cycleMarks = JSON.parse(localStorage.getItem('histolite_cycle_marks')) || {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
@@ -997,17 +1000,12 @@
             renderTodayDashboard();
         };
 
-        window.changeMonth = function(delta) {
-            currentMonth += delta;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCycleCalendar();
-        };
+        window.goToToday = function() {
+    const today = new Date();
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
+    renderCycleCalendar();
+};
 
         function renderCycleCalendar() {
             const container = document.getElementById('cycle-load-calendar');
@@ -1016,7 +1014,14 @@
             // Принудительно читаем актуальную длину из localStorage
             savedCycleLength = parseInt(localStorage.getItem('histolite_cycle_length')) || 28;
             savedPmsStartDays = parseInt(localStorage.getItem('histolite_pms_start_days')) || 7;
-
+    // Вычисляем дату ожидаемого начала следующего цикла
+    if (savedLastPeriodStart) {
+        const start = new Date(savedLastPeriodStart);
+        expectedStartDate = new Date(start);
+        expectedStartDate.setDate(start.getDate() + parseInt(savedCycleLength));
+    } else {
+        expectedStartDate = null;
+    }
             const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
             document.getElementById('calendar-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
@@ -1042,6 +1047,11 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = formatDate(currentYear, currentMonth, d);
+                // Проверяем, является ли эта дата ожидаемым днём начала следующего цикла
+const isExpected = expectedStartDate && dateStr === formatDate(expectedStartDate.getFullYear(), expectedStartDate.getMonth(), expectedStartDate.getDate());
+if (isExpected && !mark && !isToday) {
+    extraClasses += ' expected';
+}
                 const isToday = (dateStr === todayStr);
                 const mark = cycleMarks[dateStr] || null;
 
@@ -1095,8 +1105,16 @@
                     extraClasses += ' today';
                 }
 
-                html += `<div class="cycle-day-cell ${bg} ${text} ${extraClasses}" data-year="${currentYear}" data-month="${currentMonth}" data-day="${d}" onclick="openEventModal(${currentYear}, ${currentMonth}, ${d})">${label}</div>`;
-            }
+               html += `
+    <div class="flex flex-wrap gap-3 mt-2 text-xs">
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#FADBD8; border:2px solid #E74C3C; border-radius:4px;"></span> 1-й день</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#E8DAEF; border:2px solid #8E44AD; border-radius:4px;"></span> Последний день</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#FCF3CF; border:2px solid #F39C12; border-radius:4px;"></span> Овуляция</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#D5F5E3; border:2px dashed #27AE60; border-radius:4px;"></span> Ожидаемый день начала</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#D6EAF8; border:2px solid #2980B9; border-radius:4px;"></span> Сегодня</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#EAECEE; border:1px solid #BDC3C7; border-radius:4px;"></span> Задержка</span>
+    </div>
+`;
 
             html += '</div>';
             container.innerHTML = html;
