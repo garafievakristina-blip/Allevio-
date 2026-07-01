@@ -20,8 +20,6 @@
         }
     </script>
     <style>
-        /* ... все ваши стили (я их не менял) ... */
-        /* Я опускаю полные стили для краткости, но в финальном коде они будут */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         ::-webkit-scrollbar { width: 4px; }
@@ -587,12 +585,12 @@
         // 4. ЧИПСЫ (ПРОДУКТЫ) - С РАЗБИВКОЙ ДЛЯ РУЧНОГО ВВОДА
         // ================================================================
         function normalizeProductName(name) {
-    return String(name).trim().toLowerCase().replace(/\s+/g, ' ');
-}
+            return String(name).trim().toLowerCase().replace(/\s+/g, ' ');
+        }
 
-function getProductStatus(name) {
-    return safeProducts[normalizeProductName(name)] || 'none';
-}
+        function getProductStatus(name) {
+            return safeProducts[normalizeProductName(name)] || 'none';
+        }
 
         function getChipClass(status) {
             if (status === 'safe') return 'chip-safe';
@@ -610,20 +608,18 @@ function getProductStatus(name) {
             }).join('');
         }
 
-      function addChip(productName) {
-    const name = normalizeProductName(productName);
-    if (!name) return;
-
-    if (selectedProducts.some(p => p.name === name)) {
-        showModal(`Продукт "${name}" уже добавлен.`);
-        return;
-    }
-
-    const status = getProductStatus(name);
-    selectedProducts.push({ name, status });
-    renderChips();
-    document.getElementById('chip-input').value = '';
-} 
+        function addChip(productName) {
+            const name = normalizeProductName(productName);
+            if (!name) return;
+            if (selectedProducts.some(p => p.name === name)) {
+                showModal(`"${name}" уже добавлен`);
+                return;
+            }
+            const status = getProductStatus(name);
+            selectedProducts.push({ name, status });
+            renderChips();
+            document.getElementById('chip-input').value = '';
+        }
 
         function removeChip(index) {
             selectedProducts.splice(index, 1);
@@ -632,13 +628,13 @@ function getProductStatus(name) {
 
         // Функция разбивки текста на отдельные продукты (общая для голоса и ручного ввода)
         function splitProducts(text) {
-    text = String(text).toLowerCase().trim();
-    text = text.replace(/^добавьте продукты\s*/i, '');
-    text = text.replace(/^добавь продукты\s*/i, '');
-    text = text.replace(/\s+и\s+/g, ', ');
-    text = text.replace(/\s+или\s+/g, ', ');
-    return text.split(/[,.]/).map(p => p.trim()).filter(Boolean);
-}
+            text = String(text).toLowerCase().trim();
+            text = text.replace(/^добавьте продукты\s*/i, '');
+            text = text.replace(/^добавь продукты\s*/i, '');
+            text = text.replace(/\s+и\s+/g, ', ');
+            text = text.replace(/\s+или\s+/g, ', ');
+            return text.split(/[,.]/).map(p => p.trim()).filter(Boolean);
+        }
 
         // Обработчики для поля ввода продуктов (с разбивкой)
         document.addEventListener('DOMContentLoaded', function() {
@@ -717,14 +713,13 @@ function getProductStatus(name) {
         };
 
         window.setProductStatus = function(name, status) {
-    const key = normalizeProductName(name);
-    if (status === 'none') delete safeProducts[key];
-    else safeProducts[key] = status;
-
-    localStorage.setItem('histolite_safe_products', JSON.stringify(safeProducts));
-    renderSafeProducts();
-    renderChips();
-};
+            const key = normalizeProductName(name);
+            if (status === 'none') delete safeProducts[key];
+            else safeProducts[key] = status;
+            localStorage.setItem('histolite_safe_products', JSON.stringify(safeProducts));
+            renderSafeProducts();
+            renderChips();
+        };
 
         window.setSafeFilter = function(filter) {
             safeFilter = filter;
@@ -915,7 +910,7 @@ function getProductStatus(name) {
         }
 
         // ================================================================
-        // 9. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ (с разбивкой + отладка)
+        // 9. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ (с разбивкой)
         // ================================================================
         let productRecognition = null;
 
@@ -929,67 +924,58 @@ function getProductStatus(name) {
         });
 
         window.startVoiceInputForProducts = function() {
-    const micBtn = document.getElementById('mic-products-btn');
+            const micBtn = document.getElementById('mic-products-btn');
 
-    if (productRecognition) {
-        productRecognition.stop();
-        productRecognition = null;
-        micBtn.classList.remove('mic-active');
-        micBtn.textContent = '🎤';
-        return;
-    }
-
-    try {
-        productRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        productRecognition.lang = 'ru-RU';
-        productRecognition.interimResults = false;
-        productRecognition.maxAlternatives = 1;
-
-        micBtn.classList.add('mic-active');
-        micBtn.textContent = '⏹';
-
-        productRecognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript.trim();
-            const products = splitProducts(transcript);
-
-            products.forEach(function(product) {
-                if (product.trim()) addChip(product.trim());
-            });
-
-            productRecognition.stop();
-            productRecognition = null;
-            micBtn.classList.remove('mic-active');
-            micBtn.textContent = '🎤';
-        };
-
-        productRecognition.onerror = function(event) {
-            micBtn.classList.remove('mic-active');
-            micBtn.textContent = '🎤';
-            if (event.error === 'not-allowed') showModal('Разрешите доступ к микрофону.');
-            else showModal(`Ошибка распознавания: ${event.error}`);
-            productRecognition = null;
-        };
-
-        productRecognition.onend = function() {
             if (productRecognition) {
+                productRecognition.stop();
                 productRecognition = null;
                 micBtn.classList.remove('mic-active');
                 micBtn.textContent = '🎤';
+                return;
             }
-        };
 
-        productRecognition.start();
-    } catch (e) {
-        showModal('Голосовой ввод не поддерживается в этом браузере.');
-        micBtn.classList.remove('mic-active');
-        micBtn.textContent = '🎤';
-    }
-};
+            try {
+                productRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                productRecognition.lang = 'ru-RU';
+                productRecognition.interimResults = false;
+                productRecognition.maxAlternatives = 1;
+
+                micBtn.classList.add('mic-active');
+                micBtn.textContent = '⏹';
+
+                productRecognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript.trim();
+                    const products = splitProducts(transcript);
+
+                    products.forEach(function(product) {
+                        if (product.trim()) addChip(product.trim());
+                    });
+
+                    productRecognition.stop();
+                    productRecognition = null;
+                    micBtn.classList.remove('mic-active');
+                    micBtn.textContent = '🎤';
+                };
+
+                productRecognition.onerror = function(event) {
+                    micBtn.classList.remove('mic-active');
+                    micBtn.textContent = '🎤';
+                    if (event.error === 'not-allowed') showModal('Разрешите доступ к микрофону.');
+                    else showModal(`Ошибка распознавания: ${event.error}`);
+                    productRecognition = null;
+                };
+
+                productRecognition.onend = function() {
+                    if (productRecognition) {
+                        productRecognition = null;
+                        micBtn.classList.remove('mic-active');
+                        micBtn.textContent = '🎤';
+                    }
+                };
 
                 productRecognition.start();
             } catch (e) {
-                console.error('Ошибка запуска распознавания:', e);
-                showModal('Ваш браузер не поддерживает голосовой ввод. Используйте печать.');
+                showModal('Голосовой ввод не поддерживается в этом браузере.');
                 micBtn.classList.remove('mic-active');
                 micBtn.textContent = '🎤';
             }
@@ -1474,7 +1460,6 @@ function getProductStatus(name) {
         }
 
         console.log('✅ Приложение загружено. Ручной и голосовой ввод продуктов разбивают текст на отдельные чипсы.');
-        console.log('💡 Для отладки: при голосовом вводе в консоль выводятся распознанный текст и результат разбивки.');
     </script>
 
 </body>
