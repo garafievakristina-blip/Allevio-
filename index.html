@@ -384,14 +384,10 @@
                 </div>
             </div>
 
-            <!-- ============================================================ -->
-            <!-- НОВАЯ ВКЛАДКА КАЛЕНДАРЬ (исправленная, с настройками цикла) -->
-            <!-- ============================================================ -->
+            <!-- ВКЛАДКА КАЛЕНДАРЬ -->
             <div id="calendar-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-sm font-bold text-slate-700 mb-2">🌸 Женский календарь</h3>
-
-                    <!-- Настройки цикла -->
                     <div class="grid grid-cols-3 gap-2 mb-4">
                         <div>
                             <label class="text-[10px] uppercase font-bold text-slate-400 mb-1">Первый день</label>
@@ -406,8 +402,6 @@
                             <input type="number" id="period-days" min="1" max="10" value="5" class="w-full p-2 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                     </div>
-
-                    <!-- Информация о цикле -->
                     <div class="cycle-info-grid" id="cycle-info-grid">
                         <div class="cycle-info-item">
                             <div class="label">День цикла</div>
@@ -418,19 +412,13 @@
                             <div class="value" id="phase-badge" style="font-size:14px;">Не определена</div>
                         </div>
                     </div>
-
-                    <!-- Навигация по месяцам -->
                     <div class="flex items-center justify-between mb-3">
                         <button class="calendar-nav-btn" onclick="changeMonth(-1)">◀</button>
                         <span class="calendar-month-label" id="calendar-month-label">Январь 2025</span>
                         <button class="calendar-nav-btn" onclick="changeMonth(1)">▶</button>
                         <button class="calendar-nav-btn" onclick="goToToday()">Сегодня</button>
                     </div>
-
-                    <!-- Сетка календаря -->
                     <div id="cycle-load-calendar" class="cycle-calendar"></div>
-
-                    <!-- Легенда -->
                     <div class="flex flex-wrap gap-3 mt-2 text-xs">
                         <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#FADBD8; border:2px solid #E74C3C; border-radius:4px;"></span> Менструация</span>
                         <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#FCF3CF; border:2px solid #F39C12; border-radius:4px;"></span> Овуляция</span>
@@ -440,14 +428,12 @@
                         <span class="flex items-center gap-1"><span class="w-3 h-3 inline-block" style="background:#D6EAF8; border:2px solid #2980B9; border-radius:4px;"></span> Сегодня</span>
                         <span class="flex items-center gap-1">📝 Заметка</span>
                     </div>
-
-                    <!-- Кнопки очистки -->
                     <button onclick="clearAllMarks()" class="w-full mt-3 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl text-sm transition">🗑️ Очистить все отметки цикла</button>
                     <button onclick="fullReset()" class="w-full mt-2 bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition">🔄 Полный сброс данных (очистить всё)</button>
                 </div>
             </div>
 
-            <!-- ВКЛАДКА АНАЛИТИКА (без изменений) -->
+            <!-- ВКЛАДКА АНАЛИТИКА -->
             <div id="analytics-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-1">📈 Связь симптомов с фазой цикла</h2>
@@ -472,7 +458,9 @@
                 </div>
             </div>
 
-            <!-- РЕЦЕПТЫ (без изменений) -->
+            <!-- ============================================================ -->
+            <!-- ВКЛАДКА РЕЦЕПТЫ (С ДОБАВЛЕННЫМ КОНТЕЙНЕРОМ) -->
+            <!-- ============================================================ -->
             <div id="recipes-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">🍳 Рецепты</h2>
@@ -500,7 +488,10 @@
                             <input type="checkbox" id="filter-dairy-free" onchange="renderRecipes()"> 🧈 Без молочных продуктов
                         </label>
                     </div>
-                    <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    <!-- ===== КОНТЕЙНЕР ДЛЯ РЕЦЕПТОВ (ЯВНО ДОБАВЛЕН) ===== -->
+                    <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Сюда будут загружаться рецепты -->
+                    </div>
                 </div>
             </div>
         </main>
@@ -588,7 +579,7 @@
 
     <script>
         // ================================================================
-        // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (НЕ ПЕРЕОПРЕДЕЛЯТЬ!)
+        // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
         // ================================================================
         let userLogs = JSON.parse(localStorage.getItem('histolite_logs')) || [];
         let safeProducts = JSON.parse(localStorage.getItem('histolite_safe_products') || '{}');
@@ -598,7 +589,7 @@
         let savedLastPeriodStart = localStorage.getItem('histolite_last_period_start') || '';
         let savedCycleLength = parseInt(localStorage.getItem('histolite_cycle_length')) || 28;
         let savedPmsStartDays = parseInt(localStorage.getItem('histolite_pms_start_days')) || 7;
-        let savedPeriodDays = parseInt(localStorage.getItem('histolite_period_days')) || 5; // новая переменная
+        let savedPeriodDays = parseInt(localStorage.getItem('histolite_period_days')) || 5;
         let myHistamineDB = [];
         let recipesDB = [];
         let userRecipes = JSON.parse(localStorage.getItem('histolite_user_recipes')) || [];
@@ -610,21 +601,16 @@
         let selectedCycleDayDate = null;
 
         // ================================================================
-        // 2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ДАТ
+        // 2. ФУНКЦИИ ДАТ И ЦИКЛА
         // ================================================================
         function formatDate(year, month, day) {
             return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         }
-
         function parseLocalDate(dateStr) {
             if (!dateStr) return null;
             const parts = dateStr.split('-');
             return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         }
-
-        // ================================================================
-        // 3. ФУНКЦИИ РАСЧЁТА ЦИКЛА
-        // ================================================================
         function getCurrentCycleDay() {
             if (!savedLastPeriodStart) return null;
             const start = parseLocalDate(savedLastPeriodStart);
@@ -634,7 +620,6 @@
             const diff = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
             return diff > 0 ? diff : 1;
         }
-
         function getNextPeriodDate() {
             if (!savedLastPeriodStart) return null;
             const start = parseLocalDate(savedLastPeriodStart);
@@ -642,7 +627,6 @@
             next.setDate(start.getDate() + savedCycleLength);
             return next;
         }
-
         function getOvulationDate() {
             if (!savedLastPeriodStart) return null;
             const start = parseLocalDate(savedLastPeriodStart);
@@ -651,7 +635,6 @@
             ov.setDate(start.getDate() + ovulationDay - 1);
             return ov;
         }
-
         function getFertileRange() {
             const ovulation = getOvulationDate();
             if (!ovulation) return null;
@@ -661,7 +644,6 @@
             to.setDate(ovulation.getDate() + 1);
             return { from, to, ovulation };
         }
-
         function getDelayDays() {
             const next = getNextPeriodDate();
             if (!next) return 0;
@@ -673,13 +655,12 @@
         }
 
         // ================================================================
-        // 4. ОБНОВЛЕНИЕ UI ЦИКЛА
+        // 3. ОБНОВЛЕНИЕ UI ЦИКЛА
         // ================================================================
         function updateCycleUI() {
             const day = getCurrentCycleDay();
             const dayBox = document.getElementById('cycle-day-display');
             const phaseBox = document.getElementById('phase-badge');
-
             if (!day || !savedLastPeriodStart) {
                 if (dayBox) dayBox.textContent = '—';
                 if (phaseBox) {
@@ -689,13 +670,10 @@
                 }
                 return;
             }
-
             const ovulationDay = savedCycleLength - 14;
             const delayDays = getDelayDays();
-
             let phaseText = 'Стабильная';
             let phaseColor = '#10b981';
-
             if (day <= savedPeriodDays) {
                 phaseText = 'Менструация';
                 phaseColor = '#e74c3c';
@@ -709,7 +687,6 @@
                 phaseText = 'Задержка';
                 phaseColor = '#8e44ad';
             }
-
             if (dayBox) dayBox.textContent = day;
             if (phaseBox) {
                 phaseBox.textContent = phaseText;
@@ -719,42 +696,37 @@
         }
 
         // ================================================================
-        // 5. СОХРАНЕНИЕ НАСТРОЕК ЦИКЛА
+        // 4. СОХРАНЕНИЕ НАСТРОЕК ЦИКЛА
         // ================================================================
         function saveCycleSettings() {
             const dateInput = document.getElementById('last-period-start');
             const lengthInput = document.getElementById('cycle-length');
             const periodDaysInput = document.getElementById('period-days');
-
             if (dateInput) savedLastPeriodStart = dateInput.value;
             if (lengthInput) savedCycleLength = parseInt(lengthInput.value) || 28;
             if (periodDaysInput) savedPeriodDays = parseInt(periodDaysInput.value) || 5;
-
             localStorage.setItem('histolite_last_period_start', savedLastPeriodStart);
             localStorage.setItem('histolite_cycle_length', savedCycleLength);
             localStorage.setItem('histolite_period_days', savedPeriodDays);
-
             renderCycleCalendar();
             updateCycleUI();
             renderTodayDashboard();
         }
 
         // ================================================================
-        // 6. МОДАЛЬНОЕ ОКНО ДНЯ ЦИКЛА
+        // 5. МОДАЛЬНОЕ ОКНО ДНЯ ЦИКЛА
         // ================================================================
         function openDayModal(dateStr) {
             selectedCycleDayDate = dateStr;
             const dateObj = parseLocalDate(dateStr);
             const cycleDay = getCurrentCycleDayForDate(dateStr);
             const existing = cycleDayNotes[dateStr] || { symptoms: '', comment: '' };
-
             document.getElementById('cycle-day-modal-date').textContent = `Дата: ${dateObj.toLocaleDateString('ru-RU')}`;
             document.getElementById('cycle-day-modal-info').textContent = cycleDay ? `День цикла: ${cycleDay}` : 'Цикл не настроен';
             document.getElementById('cycle-day-symptoms').value = existing.symptoms || '';
             document.getElementById('cycle-day-comment').value = existing.comment || '';
             document.getElementById('cycle-day-modal').style.display = 'flex';
         }
-
         function getCurrentCycleDayForDate(dateStr) {
             if (!savedLastPeriodStart) return null;
             const start = parseLocalDate(savedLastPeriodStart);
@@ -763,12 +735,10 @@
             const diff = Math.floor((date - start) / (1000 * 60 * 60 * 24)) + 1;
             return diff > 0 ? diff : null;
         }
-
         function closeCycleDayModal() {
             document.getElementById('cycle-day-modal').style.display = 'none';
             selectedCycleDayDate = null;
         }
-
         window.saveCycleDay = function() {
             if (!selectedCycleDayDate) return;
             cycleDayNotes[selectedCycleDayDate] = {
@@ -782,7 +752,7 @@
         };
 
         // ================================================================
-        // 7. НАВИГАЦИЯ КАЛЕНДАРЯ
+        // 6. НАВИГАЦИЯ КАЛЕНДАРЯ
         // ================================================================
         window.changeMonth = function(delta) {
             currentMonth += delta;
@@ -790,7 +760,6 @@
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCycleCalendar();
         };
-
         window.goToToday = function() {
             const today = new Date();
             currentMonth = today.getMonth();
@@ -799,62 +768,49 @@
         };
 
         // ================================================================
-        // 8. ОТРИСОВКА КАЛЕНДАРЯ
+        // 7. ОТРИСОВКА КАЛЕНДАРЯ
         // ================================================================
         function renderCycleCalendar() {
             const container = document.getElementById('cycle-load-calendar');
             if (!container) return;
-
             const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
             document.getElementById('calendar-month-label').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
             const firstDay = new Date(currentYear, currentMonth, 1);
             const lastDay = new Date(currentYear, currentMonth + 1, 0);
             const daysInMonth = lastDay.getDate();
             const startDayOfWeek = firstDay.getDay();
             let offset = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-
             const today = new Date();
             const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
-
             const start = savedLastPeriodStart ? parseLocalDate(savedLastPeriodStart) : null;
             const ovulation = getOvulationDate();
             const fertile = getFertileRange();
             const nextPeriod = getNextPeriodDate();
             const delayDays = getDelayDays();
-
             let html = '<div class="grid grid-cols-7 gap-1 text-xs">';
             const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
             html += weekDays.map(d => `<div class="text-center font-bold text-slate-400">${d}</div>`).join('');
-
             for (let i = 0; i < offset; i++) {
                 html += '<div></div>';
             }
-
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateStr = formatDate(currentYear, currentMonth, d);
                 const dateObj = parseLocalDate(dateStr);
                 const isToday = dateStr === todayStr;
                 const hasNote = !!cycleDayNotes[dateStr];
-
                 let bg = 'bg-slate-100';
                 let text = 'text-slate-600';
                 let extra = '';
                 let label = String(d);
-
                 const diffDays = start ? Math.floor((dateObj - start) / (1000 * 60 * 60 * 24)) + 1 : null;
-
                 const isPeriod = diffDays !== null && diffDays >= 1 && diffDays <= savedPeriodDays;
                 const isOvulation = ovulation && dateStr === formatDate(ovulation.getFullYear(), ovulation.getMonth(), ovulation.getDate());
                 const isFertile = fertile && dateObj >= fertile.from && dateObj <= fertile.to;
                 const isNextPeriod = nextPeriod && dateStr === formatDate(nextPeriod.getFullYear(), nextPeriod.getMonth(), nextPeriod.getDate());
-
-                // Задержка: если дата позже ожидаемой, и это не отмечено как период
                 let isDelay = false;
                 if (delayDays > 0 && nextPeriod && dateObj > nextPeriod && !isPeriod && !isNextPeriod) {
                     isDelay = true;
                 }
-
                 if (isPeriod) {
                     bg = 'bg-red-200';
                     text = 'text-red-800';
@@ -878,7 +834,6 @@
                     const diffFromNext = Math.floor((dateObj - nextPeriod) / (1000 * 60 * 60 * 24));
                     label = `+${diffFromNext}`;
                 }
-
                 if (isToday) {
                     extra += ' today';
                     if (!isPeriod && !isOvulation && !isFertile && !isNextPeriod && !isDelay) {
@@ -886,11 +841,9 @@
                         text = 'text-white font-bold';
                     }
                 }
-
                 if (hasNote) {
                     extra += ' has-note';
                 }
-
                 html += `
                     <div class="cycle-day-cell ${bg} ${text} ${extra}"
                          data-date="${dateStr}"
@@ -900,35 +853,30 @@
                     </div>
                 `;
             }
-
             html += '</div>';
             container.innerHTML = html;
             updateCycleUI();
         }
 
         // ================================================================
-        // 9. ВОССТАНОВЛЕННАЯ ФУНКЦИЯ confirmEvent (для модалки event-modal)
+        // 8. ФУНКЦИЯ confirmEvent (для модалки event-modal)
         // ================================================================
         let selectedDate = null;
-
         function openEventModal(year, month, day) {
             selectedDate = formatDate(year, month, day);
             const dateObj = new Date(year, month, day);
             document.getElementById('event-modal-date').textContent = `Дата: ${dateObj.toLocaleDateString('ru-RU')}`;
             document.getElementById('event-modal').style.display = 'flex';
         }
-
         function closeEventModal() {
             document.getElementById('event-modal').style.display = 'none';
             selectedDate = null;
         }
-
         window.confirmEvent = function(type) {
             if (!selectedDate) {
                 showModal('Ошибка: дата не выбрана');
                 return;
             }
-
             if (type === 'clear') {
                 delete cycleMarks[selectedDate];
                 if (selectedDate === savedLastPeriodStart) {
@@ -942,7 +890,6 @@
                 showModal('Отметка снята');
                 return;
             }
-
             if (type === 'first_day') {
                 for (let key in cycleMarks) {
                     if (cycleMarks[key] === 'first_day') delete cycleMarks[key];
@@ -957,8 +904,6 @@
                 showModal(`Первый день цикла установлен на ${new Date(selectedDate).toLocaleDateString('ru-RU')}`);
                 return;
             }
-
-            // Для ovulation и last_day
             if (cycleMarks[selectedDate] === type) {
                 delete cycleMarks[selectedDate];
             } else {
@@ -973,13 +918,12 @@
         };
 
         // ================================================================
-        // 10. ИНИЦИАЛИЗАЦИЯ КАЛЕНДАРЯ
+        // 9. ИНИЦИАЛИЗАЦИЯ КАЛЕНДАРЯ
         // ================================================================
         function initCycleModule() {
             const dateInput = document.getElementById('last-period-start');
             const lengthInput = document.getElementById('cycle-length');
             const periodDaysInput = document.getElementById('period-days');
-
             if (dateInput) {
                 dateInput.value = savedLastPeriodStart;
                 dateInput.addEventListener('change', saveCycleSettings);
@@ -992,19 +936,12 @@
                 periodDaysInput.value = savedPeriodDays;
                 periodDaysInput.addEventListener('change', saveCycleSettings);
             }
-
             renderCycleCalendar();
             updateCycleUI();
         }
 
         // ================================================================
-        // 11. ОСТАЛЬНЫЕ ФУНКЦИИ (переключение вкладок, чипсы, продукты, голос, логи, аналитика, экспорт, модалки, юридическое)
-        // ================================================================
-        // ... они уже есть в вашем коде, я их не менял. Я только добавил недостающие, чтобы всё работало.
-        // Код ниже — это все функции, которые были в вашем исходном файле, я их оставляю без изменений.
-
-        // ================================================================
-        // 12. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+        // 10. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         // ================================================================
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -1016,7 +953,6 @@
                 else btn.classList.add('text-slate-400');
             });
         };
-
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.addEventListener('click', function() {
                 const tab = this.dataset.tab;
@@ -1025,7 +961,7 @@
         });
 
         // ================================================================
-        // 13. ЧИПСЫ (ПРОДУКТЫ)
+        // 11. ЧИПСЫ (ПРОДУКТЫ)
         // ================================================================
         function normalizeProductName(name) {
             return String(name).trim().toLowerCase().replace(/\s+/g, ' ');
@@ -1099,12 +1035,15 @@
                     }
                 });
             }
-            // Инициализация календаря после загрузки DOM
             initCycleModule();
+            // Если пользователь уже авторизован, загружаем рецепты сразу
+            if (localStorage.getItem('histolite_legal_accepted') === 'true') {
+                loadRecipes();
+            }
         });
 
         // ================================================================
-        // 14. ЗАГРУЗКА ПРОДУКТОВ И БАЗА
+        // 12. ЗАГРУЗКА ПРОДУКТОВ И БАЗА
         // ================================================================
         async function loadProducts() {
             try {
@@ -1117,7 +1056,6 @@
                 showModal('❌ Не удалось загрузить базу продуктов. Проверьте файл products.json.');
             }
         }
-
         window.renderSafeProducts = function() {
             const list = document.getElementById('safe-products-list');
             if (!list) return;
@@ -1143,7 +1081,6 @@
                 `;
             }).join('');
         };
-
         window.setProductStatus = function(name, status) {
             const key = normalizeProductName(name);
             if (status === 'none') delete safeProducts[key];
@@ -1152,7 +1089,6 @@
             renderSafeProducts();
             renderChips();
         };
-
         window.setSafeFilter = function(filter) {
             safeFilter = filter;
             document.querySelectorAll('.safe-filter-btn').forEach(b => {
@@ -1168,7 +1104,7 @@
         };
 
         // ================================================================
-        // 15. ПОИСК ПРОДУКТА
+        // 13. ПОИСК ПРОДУКТА
         // ================================================================
         window.searchProductByName = function() {
             const input = document.getElementById('product-search-input');
@@ -1195,7 +1131,7 @@
         };
 
         // ================================================================
-        // 16. СКАНЕР ШТРИХ-КОДА
+        // 14. СКАНЕР ШТРИХ-КОДА
         // ================================================================
         let html5QrCode = null;
         window.scanBarcode = function() {
@@ -1263,7 +1199,7 @@
         };
 
         // ================================================================
-        // 17. ГОЛОСОВОЙ ВВОД
+        // 15. ГОЛОСОВОЙ ВВОД
         // ================================================================
         let recognition = null;
         document.addEventListener('DOMContentLoaded', function() {
@@ -1327,7 +1263,7 @@
         }
 
         // ================================================================
-        // 18. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ
+        // 16. ГОЛОСОВОЙ ВВОД ДЛЯ ПРОДУКТОВ
         // ================================================================
         let productRecognition = null;
         document.addEventListener('DOMContentLoaded', function() {
@@ -1388,7 +1324,7 @@
         };
 
         // ================================================================
-        // 19. СОХРАНЕНИЕ ЗАПИСИ
+        // 17. СОХРАНЕНИЕ ЗАПИСИ
         // ================================================================
         window.saveLog = function() {
             const date = document.getElementById('log-date').value;
@@ -1407,23 +1343,20 @@
             let medications = medsRaw.trim() ? medsRaw.split(',').map(s=>s.trim()).filter(s=>s) : [];
             const symptomsText = document.getElementById('symptoms-text-input').value.trim();
             const cycleDay = (userGender === 'male') ? 0 : getCurrentCycleDay();
-
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
             userLogs.push({ date, time, cycleDay, products, medications, symptomsText });
             localStorage.setItem('histolite_logs', JSON.stringify(userLogs));
-
             selectedProducts = [];
             renderChips();
             document.getElementById('medications').value = '';
             document.getElementById('symptoms-text-input').value = '';
-
             renderHistory();
             renderTodayDashboard();
             showModal('Запись сохранена');
         };
 
         // ================================================================
-        // 20. ИСТОРИЯ
+        // 18. ИСТОРИЯ
         // ================================================================
         window.renderHistory = function() {
             const container = document.getElementById('history-container');
@@ -1446,7 +1379,6 @@
             `).join('');
             container.innerHTML = html;
         };
-
         window.deleteLog = function(date, time) {
             userLogs = userLogs.filter(l => !(l.date === date && l.time === time));
             localStorage.setItem('histolite_logs', JSON.stringify(userLogs));
@@ -1454,7 +1386,6 @@
             renderTodayDashboard();
             showModal('Запись удалена');
         };
-
         window.clearAllLogs = function() {
             if (confirm('Очистить все записи?')) {
                 userLogs = [];
@@ -1466,7 +1397,7 @@
         };
 
         // ================================================================
-        // 21. ДАШБОРД (СЕГОДНЯ)
+        // 19. ДАШБОРД (СЕГОДНЯ)
         // ================================================================
         function renderTodayDashboard() {
             const cycleDay = getCurrentCycleDay();
@@ -1474,14 +1405,12 @@
             let riskClass = 'risk-low';
             let riskReason = 'Фаза цикла: стабильная';
             let tip = 'Сегодня хороший день, чтобы попробовать новые продукты.';
-
             let delayDays = 0;
             if (savedLastPeriodStart && cycleDay !== null) {
                 if (cycleDay > savedCycleLength) {
                     delayDays = cycleDay - savedCycleLength;
                 }
             }
-
             if (delayDays > 0) {
                 riskLevel = 'ВЫСОКИЙ (ЗАДЕРЖКА)';
                 riskClass = 'risk-high';
@@ -1514,19 +1443,16 @@
                 riskReason = 'Цикл не настроен';
                 tip = 'Отметьте первый день цикла в календаре.';
             }
-
             const riskCard = document.getElementById('risk-card');
             riskCard.className = `risk-card ${riskClass}`;
             document.getElementById('risk-level').textContent = riskLevel;
             document.getElementById('risk-reason').textContent = riskReason;
             document.getElementById('today-tip').textContent = tip;
-
             const now = new Date();
             const sevenDaysAgo = new Date(now);
             sevenDaysAgo.setDate(now.getDate() - 7);
             const weekLogs = userLogs.filter(log => new Date(log.date) >= sevenDaysAgo && new Date(log.date) <= now);
             document.getElementById('week-logs').textContent = weekLogs.length;
-
             let streak = 0;
             if (userLogs.length > 0) {
                 const dates = userLogs.map(log => log.date).sort();
@@ -1551,10 +1477,8 @@
                 }
             }
             document.getElementById('streak').textContent = streak;
-
             const lastTriggers = JSON.parse(localStorage.getItem('histolite_last_triggers')) || [];
             document.getElementById('triggers-count').textContent = lastTriggers.length;
-
             const weekGoal = 5;
             const progressPercent = Math.min(100, Math.round((weekLogs.length / weekGoal) * 100));
             const goalMessage = (weekLogs.length >= weekGoal) ? '🎉 Цель недели выполнена!' : `📝 Осталось ${weekGoal - weekLogs.length} записей до цели`;
@@ -1564,7 +1488,6 @@
             if (streak >= 30) badges.push('💎 30 дней подряд');
             if (userLogs.length >= 10) badges.push('🔍 10 продуктов проверено');
             if (lastTriggers.length >= 3) badges.push('🧠 Найдено 3 триггера');
-
             document.getElementById('progress-container').innerHTML = `
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mt-4">
                     <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">🎯 Ваш прогресс</div>
@@ -1581,7 +1504,7 @@
         }
 
         // ================================================================
-        // 22. УВЕДОМЛЕНИЯ
+        // 20. УВЕДОМЛЕНИЯ
         // ================================================================
         function checkNotifications() {
             const lastVisit = localStorage.getItem('histolite_last_visit');
@@ -1596,14 +1519,14 @@
         }
 
         // ================================================================
-        // 23. АНАЛИТИКА (заглушка)
+        // 21. АНАЛИТИКА (заглушка)
         // ================================================================
         window.runAdvancedAnalytics = function() {
             showModal('Анализ триггеров пока в разработке. Скоро появится!');
         };
 
         // ================================================================
-        // 24. ЭКСПОРТ (заглушки)
+        // 22. ЭКСПОРТ (заглушки)
         // ================================================================
         window.exportToCSV = function() {
             showModal('Экспорт CSV – будет реализован в следующей версии.');
@@ -1613,7 +1536,7 @@
         };
 
         // ================================================================
-        // 25. МОДАЛЬНЫЕ ОКНА
+        // 23. МОДАЛЬНЫЕ ОКНА
         // ================================================================
         window.showModal = function(msg) {
             document.getElementById('custom-modal-message').textContent = msg;
@@ -1624,7 +1547,7 @@
         };
 
         // ================================================================
-        // 26. ЮРИДИЧЕСКОЕ СОГЛАСИЕ
+        // 24. ЮРИДИЧЕСКОЕ СОГЛАСИЕ
         // ================================================================
         function toggleLegalButton() {
             const chk = document.getElementById('legal-checkbox');
@@ -1653,45 +1576,76 @@
             loadProducts();
             renderTodayDashboard();
             checkNotifications();
+            // ЗАГРУЗКА РЕЦЕПТОВ (важно!)
             loadRecipes();
             // календарь инициализируется автоматически через DOMContentLoaded
-            // но на всякий случай вызовем
             renderCycleCalendar();
             updateCycleUI();
         };
 
         // ================================================================
-        // 27. РАБОТА С РЕЦЕПТАМИ
+        // 25. РАБОТА С РЕЦЕПТАМИ (ИСПРАВЛЕННАЯ ВЕРСИЯ)
         // ================================================================
         async function loadRecipes() {
-    const container = document.getElementById('recipes-container');
-    if (!container) {
-        console.error('Контейнер recipes-container не найден!');
-        return;
-    }
-    container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
+            const container = document.getElementById('recipes-container');
+            // Если контейнер не найден, создадим его, чтобы не было ошибки
+            if (!container) {
+                console.error('Контейнер recipes-container не найден! Создаём заново.');
+                const parent = document.querySelector('#recipes-tab .bg-white');
+                if (parent) {
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'recipes-container';
+                    newContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+                    parent.appendChild(newContainer);
+                    // Повторно запрашиваем контейнер
+                    const newRef = document.getElementById('recipes-container');
+                    if (newRef) {
+                        newRef.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
+                        try {
+                            const resp = await fetch('recipes.json');
+                            if (!resp.ok) throw new Error(`HTTP ошибка: ${resp.status}`);
+                            const data = await resp.json();
+                            recipesDB = data;
+                            renderRecipes();
+                        } catch (error) {
+                            console.error('Ошибка загрузки рецептов:', error);
+                            newRef.innerHTML = `<p class="text-center text-red-500 col-span-full py-8">❌ Не удалось загрузить рецепты: ${error.message}</p>`;
+                        }
+                    }
+                }
+                return;
+            }
 
-    try {
-        const resp = await fetch('recipes.json');
-        if (!resp.ok) {
-            throw new Error(`HTTP ошибка: ${resp.status}`);
+            // Если контейнер есть, работаем через него
+            container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
+
+            try {
+                const resp = await fetch('recipes.json');
+                if (!resp.ok) {
+                    throw new Error(`HTTP ошибка: ${resp.status}`);
+                }
+                const data = await resp.json();
+                recipesDB = data;
+                console.log(`✅ Загружено ${recipesDB.length} рецептов`);
+                renderRecipes();
+            } catch (error) {
+                console.error('Ошибка загрузки рецептов:', error);
+                container.innerHTML = `<p class="text-center text-red-500 col-span-full py-8">❌ Не удалось загрузить рецепты: ${error.message}</p>`;
+                recipesDB = [];
+                renderRecipes(); // покажет "ничего не найдено"
+            }
         }
-        const data = await resp.json();
-        recipesDB = data;
-        console.log(`✅ Загружено ${recipesDB.length} рецептов`);
-        renderRecipes();
-    } catch (error) {
-        console.error('Ошибка загрузки рецептов:', error);
-        container.innerHTML = `<p class="text-center text-red-500 col-span-full py-8">❌ Не удалось загрузить рецепты: ${error.message}</p>`;
-        recipesDB = [];
-        renderRecipes(); // покажет "ничего не найдено"
-    }
-}
 
         function renderRecipes() {
             const container = document.getElementById('recipes-container');
-            if (!container) return;
+            if (!container) {
+                console.error('Контейнер recipes-container не найден в renderRecipes');
+                return;
+            }
+
             const allRecipes = [...recipesDB, ...userRecipes];
+            console.log(`Всего рецептов: ${allRecipes.length}`);
+
             const categoryFilter = document.querySelector('.recipe-filter-btn.active')?.dataset.category || 'all';
             const levelFilter = document.querySelector('.level-filter-btn.active')?.dataset.level || 'all';
             const gf = document.getElementById('filter-gluten-free')?.checked || false;
@@ -1707,6 +1661,8 @@
                 if (df) matchDiet = matchDiet && (r.dairy_free === true);
                 return matchCategory && matchLevel && matchDiet;
             });
+
+            console.log(`Отфильтровано: ${filtered.length} рецептов`);
 
             if (filtered.length === 0) {
                 container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">По вашему запросу ничего не найдено.</p>';
@@ -1788,7 +1744,7 @@
         });
 
         // ================================================================
-        // 28. КНОПКИ ОЧИСТКИ
+        // 26. КНОПКИ ОЧИСТКИ
         // ================================================================
         window.clearAllMarks = function() {
             if (confirm('Удалить все отметки цикла (первый день, овуляция, последний день)?')) {
@@ -1801,7 +1757,6 @@
                 showModal('Все отметки удалены. Теперь отметьте первый день цикла заново.');
             }
         };
-
         window.fullReset = function() {
             if (confirm('Это удалит ВСЕ данные: записи, продукты, настройки цикла, отметки. Продолжить?')) {
                 const keys = [
@@ -1824,7 +1779,7 @@
         };
 
         // ================================================================
-        // 29. ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ (если уже приняли согласие)
+        // 27. ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ
         // ================================================================
         if (localStorage.getItem('histolite_legal_accepted') === 'true') {
             setTimeout(function() {
@@ -1867,7 +1822,7 @@
             }, 100);
         }
 
-        console.log('✅ Приложение загружено. Календарь переработан, кнопка "Войти" работает.');
+        console.log('✅ Приложение загружено. Календарь переработан, кнопка "Войти" работает, рецепты загружаются.');
     </script>
 </body>
 </html>
