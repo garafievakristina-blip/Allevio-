@@ -132,7 +132,6 @@
         .mic-active { background-color: #3b82f6 !important; transform: scale(1.1); box-shadow: 0 0 10px #3b82f6; }
         .mic-error { background-color: #ef4444 !important; }
 
-        /* ===== ПАСТЕЛЬНЫЕ ЦВЕТА ДЛЯ КАЛЕНДАРЯ ===== */
         .cycle-day-cell {
             aspect-ratio: 1 / 1;
             display: flex;
@@ -149,47 +148,14 @@
             padding: 2px;
             line-height: 1.2;
         }
-        .cycle-day-cell:hover {
-            opacity: 0.8;
-            transform: scale(0.95);
-        }
-        .cycle-day-cell.today {
-            background-color: #D6EAF8 !important;
-            border: 2px solid #2980B9;
-            box-shadow: 0 0 4px #2980B9;
-        }
-        .cycle-day-cell.period-day {
-            background-color: #FADBD8 !important;
-            border: 2px solid #E74C3C;
-            box-shadow: 0 0 4px #E74C3C;
-        }
-        .cycle-day-cell.ovulation-day {
-            background-color: #FCF3CF !important;
-            border: 2px solid #F39C12;
-            box-shadow: 0 0 4px #F39C12;
-        }
-        .cycle-day-cell.fertile-day {
-            background-color: #D5F5E3 !important;
-            border: 2px solid #27AE60;
-            box-shadow: 0 0 4px #27AE60;
-        }
-        .cycle-day-cell.next-period-day {
-            background-color: #E8DAEF !important;
-            border: 2px dashed #8E44AD;
-            box-shadow: 0 0 4px #8E44AD;
-        }
-        .cycle-day-cell.delay-day {
-            background-color: #EAECEE !important;
-            color: #7F8C8D;
-            border: 1px solid #BDC3C7;
-        }
-        .cycle-day-cell.has-note::after {
-            content: '📝';
-            position: absolute;
-            top: 1px;
-            right: 3px;
-            font-size: 0.5rem;
-        }
+        .cycle-day-cell:hover { opacity: 0.8; transform: scale(0.95); }
+        .cycle-day-cell.today { background-color: #D6EAF8 !important; border: 2px solid #2980B9; box-shadow: 0 0 4px #2980B9; }
+        .cycle-day-cell.period-day { background-color: #FADBD8 !important; border: 2px solid #E74C3C; box-shadow: 0 0 4px #E74C3C; }
+        .cycle-day-cell.ovulation-day { background-color: #FCF3CF !important; border: 2px solid #F39C12; box-shadow: 0 0 4px #F39C12; }
+        .cycle-day-cell.fertile-day { background-color: #D5F5E3 !important; border: 2px solid #27AE60; box-shadow: 0 0 4px #27AE60; }
+        .cycle-day-cell.next-period-day { background-color: #E8DAEF !important; border: 2px dashed #8E44AD; box-shadow: 0 0 4px #8E44AD; }
+        .cycle-day-cell.delay-day { background-color: #EAECEE !important; color: #7F8C8D; border: 1px solid #BDC3C7; }
+        .cycle-day-cell.has-note::after { content: '📝'; position: absolute; top: 1px; right: 3px; font-size: 0.5rem; }
 
         .calendar-nav-btn {
             padding: 4px 10px;
@@ -199,15 +165,8 @@
             cursor: pointer;
             transition: all 0.15s;
         }
-        .calendar-nav-btn:hover {
-            background: #f1f5f9;
-        }
-        .calendar-month-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #0f172a;
-        }
-        /* Стили для модуля цикла */
+        .calendar-nav-btn:hover { background: #f1f5f9; }
+        .calendar-month-label { font-weight: 600; font-size: 0.9rem; color: #0f172a; }
         .cycle-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -221,17 +180,8 @@
             text-align: center;
             border: 1px solid #e2e8f0;
         }
-        .cycle-info-item .label {
-            font-size: 10px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-        .cycle-info-item .value {
-            font-size: 16px;
-            font-weight: bold;
-            color: #0f172a;
-        }
+        .cycle-info-item .label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: bold; }
+        .cycle-info-item .value { font-size: 16px; font-weight: bold; color: #0f172a; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24">
@@ -300,7 +250,7 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА ДНЕВНИК (без изменений) -->
+            <!-- ВКЛАДКА ДНЕВНИК -->
             <div id="diary-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">📝 Новая запись</h2>
@@ -342,7 +292,7 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА ПРОДУКТЫ (без изменений) -->
+            <!-- ВКЛАДКА ПРОДУКТЫ -->
             <div id="products-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">🔍 Узнать уровень гистамина</h2>
@@ -366,7 +316,7 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА БАЗА (без изменений) -->
+            <!-- ВКЛАДКА БАЗА -->
             <div id="safe-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">📋 Моя база «Можно / Нельзя»</h2>
@@ -451,16 +401,12 @@
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-2">📎 Экспорт данных</h2>
                     <button onclick="exportToCSV()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-xs shadow-md">Скачать отчёт (CSV)</button>
-                    <button onclick="exportToPDF()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-xs shadow-md mt-2">
-                        📄 Скачать отчёт для врача (PDF)
-                    </button>
+                    <button onclick="exportToPDF()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition text-xs shadow-md mt-2">📄 Скачать отчёт для врача (PDF)</button>
                     <p class="text-[10px] text-slate-400 mt-2">*PDF с таблицей, статистикой и графиком</p>
                 </div>
             </div>
 
-            <!-- ============================================================ -->
-            <!-- ВКЛАДКА РЕЦЕПТЫ (С ДОБАВЛЕННЫМ КОНТЕЙНЕРОМ) -->
-            <!-- ============================================================ -->
+            <!-- ===== ВКЛАДКА РЕЦЕПТЫ ===== -->
             <div id="recipes-tab" class="tab-content space-y-4">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                     <h2 class="text-base font-bold mb-3 text-slate-800">🍳 Рецепты</h2>
@@ -488,7 +434,6 @@
                             <input type="checkbox" id="filter-dairy-free" onchange="renderRecipes()"> 🧈 Без молочных продуктов
                         </label>
                     </div>
-                    <!-- ===== КОНТЕЙНЕР ДЛЯ РЕЦЕПТОВ ===== -->
                     <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <!-- Сюда будут загружаться рецепты -->
                     </div>
@@ -504,9 +449,7 @@
             <button data-tab="safe" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📋</span><span>База</span></button>
             <button data-tab="calendar" id="calendar-nav-btn" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">🌸</span><span>Календарь</span></button>
             <button data-tab="analytics" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">📊</span><span>Анализ</span></button>
-            <button data-tab="recipes" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]">
-                <span class="text-lg">🍳</span><span>Рецепты</span>
-            </button>
+            <button data-tab="recipes" class="tab-button flex flex-col items-center p-1.5 text-slate-400 font-bold text-[10px] gap-0.5 flex-shrink-0 min-w-[56px]"><span class="text-lg">🍳</span><span>Рецепты</span></button>
         </nav>
 
         <!-- ФУТЕР -->
@@ -652,6 +595,16 @@
             next.setHours(0,0,0,0);
             const diff = Math.floor((today - next) / (1000 * 60 * 60 * 24));
             return diff > 0 ? diff : 0;
+        }
+        function getCyclePhaseName(day) {
+            if (!day) return 'Не определена';
+            if (day <= savedPeriodDays) return 'Менструация';
+            const ovulationDay = savedCycleLength - 14;
+            if (day === ovulationDay) return 'Овуляция';
+            if (day >= ovulationDay - 5 && day <= ovulationDay + 1) return 'Фертильное окно';
+            if (day > ovulationDay + 1 && day < savedCycleLength) return 'Лютеиновая';
+            if (day >= savedCycleLength) return 'Задержка';
+            return 'Начало цикла';
         }
 
         // ================================================================
@@ -1576,15 +1529,13 @@
             loadProducts();
             renderTodayDashboard();
             checkNotifications();
-            // ЗАГРУЗКА РЕЦЕПТОВ (важно!)
             loadRecipes();
-            // календарь инициализируется автоматически через DOMContentLoaded
             renderCycleCalendar();
             updateCycleUI();
         };
 
         // ================================================================
-        // 25. РАБОТА С РЕЦЕПТАМИ (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+        // 25. РАБОТА С РЕЦЕПТАМИ (ИСПРАВЛЕННАЯ ВЕРСИЯ + ПРИНУДИТЕЛЬНАЯ ВСТАВКА)
         // ================================================================
         async function loadRecipes() {
             const container = document.getElementById('recipes-container');
@@ -1595,7 +1546,7 @@
 
             container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
 
-            // Тестовые рецепты (используются только при ошибке загрузки файла)
+            // Тестовые рецепты (гарантированно рабочие)
             const testRecipes = [
                 {
                     id: 1,
@@ -1635,12 +1586,12 @@
                 const resp = await fetch('recipes.json');
                 if (!resp.ok) throw new Error('Файл не найден');
                 const data = await resp.json();
-                recipesDB = data; // загружаем реальные рецепты
+                recipesDB = data;
                 console.log(`✅ Загружено ${recipesDB.length} рецептов из файла`);
                 renderRecipes();
             } catch (error) {
                 console.warn('Не удалось загрузить recipes.json, используем тестовые рецепты:', error);
-                recipesDB = testRecipes; // подставляем тестовые
+                recipesDB = testRecipes;
                 container.innerHTML = `<p class="text-center text-amber-600 col-span-full py-2">⚠️ Используются встроенные тестовые рецепты (файл не найден)</p>`;
                 renderRecipes();
             }
@@ -1653,9 +1604,45 @@
                 return;
             }
 
-            const allRecipes = [...recipesDB, ...userRecipes];
-            console.log(`Всего рецептов: ${allRecipes.length}`);
+            // Если recipesDB пуста, вставляем тестовые рецепты прямо здесь (на всякий случай)
+            if (recipesDB.length === 0) {
+                recipesDB = [
+                    {
+                        id: 1,
+                        name: 'Овсяная каша на воде',
+                        category: 'завтрак',
+                        histamine_level: 'низкий',
+                        prep_time: 10,
+                        servings: 1,
+                        description: 'Лёгкий и безопасный завтрак при гистаминовой непереносимости.',
+                        ingredients: ['овсяные хлопья 50 г', 'вода 200 мл', 'соль по вкусу', 'банан 1 шт (по желанию)'],
+                        instructions: 'Залейте хлопья водой, доведите до кипения, варите 5 минут. Подавайте с бананом.',
+                        tips: 'Можно добавить немного мёда, если переносится.',
+                        gluten_free: true,
+                        lactose_free: true,
+                        dairy_free: true,
+                        image: 'https://via.placeholder.com/300x200?text=Овсянка'
+                    },
+                    {
+                        id: 2,
+                        name: 'Запечённая куриная грудка с овощами',
+                        category: 'обед',
+                        histamine_level: 'средний',
+                        prep_time: 30,
+                        servings: 2,
+                        description: 'Сытное блюдо с низким содержанием гистамина при правильном приготовлении.',
+                        ingredients: ['куриная грудка 300 г', 'цукини 1 шт', 'перец болгарский 1 шт', 'оливковое масло 1 ст.л.', 'специи (без острых)'],
+                        instructions: 'Нарежьте овощи и грудку, смешайте с маслом и специями, запекайте при 180°C 25 минут.',
+                        tips: 'Не используйте томаты или сыр — они могут повысить уровень гистамина.',
+                        gluten_free: true,
+                        lactose_free: true,
+                        dairy_free: true,
+                        image: 'https://via.placeholder.com/300x200?text=Курица+с+овощами'
+                    }
+                ];
+            }
 
+            const allRecipes = [...recipesDB, ...userRecipes];
             const categoryFilter = document.querySelector('.recipe-filter-btn.active')?.dataset.category || 'all';
             const levelFilter = document.querySelector('.level-filter-btn.active')?.dataset.level || 'all';
             const gf = document.getElementById('filter-gluten-free')?.checked || false;
@@ -1671,8 +1658,6 @@
                 if (df) matchDiet = matchDiet && (r.dairy_free === true);
                 return matchCategory && matchLevel && matchDiet;
             });
-
-            console.log(`Отфильтровано: ${filtered.length} рецептов`);
 
             if (filtered.length === 0) {
                 container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">По вашему запросу ничего не найдено.</p>';
@@ -1829,10 +1814,52 @@
                 loadRecipes();
                 renderCycleCalendar();
                 updateCycleUI();
+
+                // ПРИНУДИТЕЛЬНАЯ ВСТАВКА РЕЦЕПТОВ, ЕСЛИ ОНИ ВСЁ ЕЩЁ НЕ ПОЯВИЛИСЬ
+                setTimeout(function() {
+                    if (recipesDB.length === 0) {
+                        recipesDB = [
+                            {
+                                id: 1,
+                                name: 'Овсяная каша на воде',
+                                category: 'завтрак',
+                                histamine_level: 'низкий',
+                                prep_time: 10,
+                                servings: 1,
+                                description: 'Лёгкий и безопасный завтрак при гистаминовой непереносимости.',
+                                ingredients: ['овсяные хлопья 50 г', 'вода 200 мл', 'соль по вкусу', 'банан 1 шт (по желанию)'],
+                                instructions: 'Залейте хлопья водой, доведите до кипения, варите 5 минут. Подавайте с бананом.',
+                                tips: 'Можно добавить немного мёда, если переносится.',
+                                gluten_free: true,
+                                lactose_free: true,
+                                dairy_free: true,
+                                image: 'https://via.placeholder.com/300x200?text=Овсянка'
+                            },
+                            {
+                                id: 2,
+                                name: 'Запечённая куриная грудка с овощами',
+                                category: 'обед',
+                                histamine_level: 'средний',
+                                prep_time: 30,
+                                servings: 2,
+                                description: 'Сытное блюдо с низким содержанием гистамина при правильном приготовлении.',
+                                ingredients: ['куриная грудка 300 г', 'цукини 1 шт', 'перец болгарский 1 шт', 'оливковое масло 1 ст.л.', 'специи (без острых)'],
+                                instructions: 'Нарежьте овощи и грудку, смешайте с маслом и специями, запекайте при 180°C 25 минут.',
+                                tips: 'Не используйте томаты или сыр — они могут повысить уровень гистамина.',
+                                gluten_free: true,
+                                lactose_free: true,
+                                dairy_free: true,
+                                image: 'https://via.placeholder.com/300x200?text=Курица+с+овощами'
+                            }
+                        ];
+                        renderRecipes();
+                        console.log('✅ Рецепты вставлены принудительно через таймер');
+                    }
+                }, 1000);
             }, 100);
         }
 
-        console.log('✅ Приложение загружено. Рецепты загружаются из файла (или тестовые при ошибке).');
+        console.log('✅ Приложение загружено. Рецепты появятся на вкладке 🍳.');
     </script>
 </body>
 </html>
