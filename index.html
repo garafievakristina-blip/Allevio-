@@ -1586,36 +1586,54 @@
         // ================================================================
         // 25. РАБОТА С РЕЦЕПТАМИ (ИСПРАВЛЕННАЯ ВЕРСИЯ)
         // ================================================================
-        async function loadRecipes() {
-            const container = document.getElementById('recipes-container');
-            // Если контейнер не найден, создадим его, чтобы не было ошибки
-            if (!container) {
-                console.error('Контейнер recipes-container не найден! Создаём заново.');
-                const parent = document.querySelector('#recipes-tab .bg-white');
-                if (parent) {
-                    const newContainer = document.createElement('div');
-                    newContainer.id = 'recipes-container';
-                    newContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
-                    parent.appendChild(newContainer);
-                    // Повторно запрашиваем контейнер
-                    const newRef = document.getElementById('recipes-container');
-                    if (newRef) {
-                        newRef.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
-                        try {
-                            const resp = await fetch('recipes.json');
-                            if (!resp.ok) throw new Error(`HTTP ошибка: ${resp.status}`);
-                            const data = await resp.json();
-                            recipesDB = data;
-                            renderRecipes();
-                        } catch (error) {
-                            console.error('Ошибка загрузки рецептов:', error);
-                            newRef.innerHTML = `<p class="text-center text-red-500 col-span-full py-8">❌ Не удалось загрузить рецепты: ${error.message}</p>`;
-                        }
-                    }
-                }
-                return;
-            }
+       async function loadRecipes() {
+    // Временно используем встроенные рецепты для проверки отображения
+    const testRecipes = [
+        {
+            "id": 1,
+            "name": "Тестовый рецепт 1",
+            "category": "завтрак",
+            "histamine_level": "низкий",
+            "gluten_free": true,
+            "lactose_free": true,
+            "dairy_free": true,
+            "description": "Описание тестового рецепта",
+            "ingredients": ["ингредиент 1", "ингредиент 2"],
+            "instructions": "1. Шаг 1\n2. Шаг 2",
+            "prep_time": 10,
+            "servings": 1,
+            "image": "",
+            "tips": "Тестовый совет"
+        },
+        {
+            "id": 2,
+            "name": "Тестовый рецепт 2",
+            "category": "обед",
+            "histamine_level": "средний",
+            "gluten_free": false,
+            "lactose_free": true,
+            "dairy_free": false,
+            "description": "Второй тестовый рецепт",
+            "ingredients": ["ингредиент A", "ингредиент B"],
+            "instructions": "1. Сделайте это\n2. Сделайте то",
+            "prep_time": 20,
+            "servings": 2,
+            "image": "",
+            "tips": "Ещё один совет"
+        }
+    ];
 
+    const container = document.getElementById('recipes-container');
+    if (!container) {
+        alert('Контейнер не найден!');
+        return;
+    }
+
+    // Загружаем тестовые рецепты
+    recipesDB = testRecipes;
+    container.innerHTML = `<p class="text-center text-emerald-600 col-span-full py-2">✅ Загружено ${recipesDB.length} тестовых рецептов</p>`;
+    renderRecipes();
+}
             // Если контейнер есть, работаем через него
             container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
 
