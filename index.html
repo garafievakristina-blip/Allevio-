@@ -1587,42 +1587,43 @@
         // 25. РАБОТА С РЕЦЕПТАМИ (ТЕСТОВАЯ ВЕРСИЯ)
         // ================================================================
         async function loadRecipes() {
-            // Временно используем встроенные рецепты для проверки отображения
-            const testRecipes = [
-                {
-                    "id": 1,
-                    "name": "Тестовый рецепт 1",
-                    "category": "завтрак",
-                    "histamine_level": "низкий",
-                    "gluten_free": true,
-                    "lactose_free": true,
-                    "dairy_free": true,
-                    "description": "Описание тестового рецепта",
-                    "ingredients": ["ингредиент 1", "ингредиент 2"],
-                    "instructions": "1. Шаг 1\n2. Шаг 2",
-                    "prep_time": 10,
-                    "servings": 1,
-                    "image": "",
-                    "tips": "Тестовый совет"
-                },
-                {
-                    "id": 2,
-                    "name": "Тестовый рецепт 2",
-                    "category": "обед",
-                    "histamine_level": "средний",
-                    "gluten_free": false,
-                    "lactose_free": true,
-                    "dairy_free": false,
-                    "description": "Второй тестовый рецепт",
-                    "ingredients": ["ингредиент A", "ингредиент B"],
-                    "instructions": "1. Сделайте это\n2. Сделайте то",
-                    "prep_time": 20,
-                    "servings": 2,
-                    "image": "",
-                    "tips": "Ещё один совет"
-                }
-            ];
+    const container = document.getElementById('recipes-container');
+    if (!container) {
+        alert('Контейнер recipes-container не найден!');
+        return;
+    }
 
+    container.innerHTML = '<p class="text-center text-slate-400 col-span-full py-8">⏳ Загрузка рецептов...</p>';
+
+    try {
+        const resp = await fetch('recipes.json');
+        if (!resp.ok) {
+            throw new Error(`Ошибка HTTP: ${resp.status}`);
+        }
+        const data = await resp.json();
+        recipesDB = data;
+        console.log(`✅ Загружено ${recipesDB.length} рецептов из файла`);
+        renderRecipes();
+    } catch (error) {
+        console.error('Ошибка загрузки рецептов:', error);
+        // Если не удалось загрузить файл, показываем подсказку
+        container.innerHTML = `
+            <div class="text-center text-red-500 col-span-full py-4">
+                <p>❌ Не удалось загрузить рецепты.</p>
+                <p class="text-xs text-slate-500 mt-2">Убедитесь, что файл recipes.json лежит в той же папке.</p>
+                <p class="text-xs text-slate-500">Если вы открываете страницу локально (через file://), попробуйте запустить через Live Server или Python http.server.</p>
+                <button onclick="loadRecipes()" class="mt-3 bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm">🔄 Повторить попытку</button>
+            </div>
+        `;
+        // Для демонстрации можно оставить тестовые рецепты, чтобы не было пусто
+        // Но мы покажем ошибку, чтобы вы знали, что делать.
+        // Если хотите, чтобы тестовые рецепты оставались при ошибке, можно сделать:
+        // const testRecipes = [...]; // и использовать их
+        // но я оставлю ошибку, чтобы вы поняли, что нужно запустить сервер.
+        recipesDB = [];
+        renderRecipes();
+    }
+}
             const container = document.getElementById('recipes-container');
             if (!container) {
                 alert('Контейнер recipes-container не найден!');
